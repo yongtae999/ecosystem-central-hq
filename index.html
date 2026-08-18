@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>생태계교란생물 제거사업 전국 통합 관제 플랫폼 | (사)야생생물관리협회 중앙사무국</title>
+  
+  <!-- Open Graph Meta for Social Sharing -->
+  <meta property="og:title" content="(사)야생생물관리협회 전국 생태계교란생물 제거사업 통합 관제 플랫폼">
+  <meta property="og:description" content="중앙사무국 및 전국 9개 지부 실시간 드론 정사영상 모니터링 및 실적 통합 관제 시스템">
+  <meta property="og:image" content="assets/images/og_share_logo.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/images/app_logo.png">
+
+  <!-- Web Fonts -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- MapLibre GL JS CSS & JS -->
+  <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css?v=20260819_01">
+</head>
+<body>
+
+  <!-- 1. GLOBAL HEADER -->
+  <header class="global-header">
+    <div class="brand-section">
+      <img src="assets/images/app_logo.png" alt="(사)야생생물관리협회 로고" class="brand-logo">
+      <div class="brand-text-wrap">
+        <div class="brand-title">
+          <span>생태계교란생물 제거사업 전국 통합 관제 플랫폼</span>
+          <span class="hq-badge">중앙사무국 HQ</span>
+        </div>
+        <div class="brand-subtitle">
+          (사)야생생물관리협회 · 전국 9개 시·도 지부 드론 GIS 통합 모니터링 시스템
+        </div>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <!-- 9 Branches Dropdown Selector -->
+      <div class="branch-select-wrap">
+        <i class="fa-solid fa-location-crosshairs"></i>
+        <select id="branch-dropdown-select" class="branch-dropdown">
+          <option value="all" selected>🌐 전국 9개 지부 전체 관제</option>
+          <option value="daejeon-chungnam-sejong">📍 대전·충남·세종 지부 (금강 천내리 등)</option>
+          <option value="seoul-gyeonggi">📍 서울·인천·경기 지부 (한강수계)</option>
+          <option value="gangwon">📍 강원 지부 (소양호·북한강)</option>
+          <option value="chungbuk">📍 충북 지부 (충주호·남한강)</option>
+          <option value="daegu-gyeongbuk">📍 대구·경북 지부 (낙동강 중상류)</option>
+          <option value="busan-ulsan-gyeongnam">📍 부산·울산·경남 지부 (낙동강 하구)</option>
+          <option value="jeonbuk">📍 전북 지부 (만경강·동진강)</option>
+          <option value="gwangju-jeonnam">📍 광주·전남 지부 (영산강·섬진강)</option>
+          <option value="jeju">📍 제주 지부 (곶자왈 보호구역)</option>
+        </select>
+      </div>
+
+      <a href="https://yongtae999.github.io/geumgang-drone-monitor/" target="_blank" class="btn-tactical primary" title="금강유역 천내리습지 3D 드론 정사영상 실시간 관제 시스템 열기">
+        <i class="fa-solid fa-plane-up"></i> <span>금강 드론 관제</span>
+      </a>
+
+      <button id="btn-fullscreen" class="btn-tactical secondary icon-only" title="전체화면 전환">
+        <i class="fa-solid fa-expand"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- 2. MAIN 3-COLUMN LAYOUT -->
+  <main class="main-layout">
+
+    <!-- LEFT SIDEBAR: 9 Branches & Projects -->
+    <aside class="sidebar left-sidebar">
+      
+      <!-- 9 Official Branches Grid -->
+      <div class="sidebar-section">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fa-solid fa-sitemap"></i> 전국 9개 시·도 지부 현황
+          </div>
+          <span class="section-badge" style="color: var(--accent-emerald);">9개 지부 정규 가동</span>
+        </div>
+        <div class="branch-grid" id="branch-cards-container">
+          <!-- Populated by branch-manager.js -->
+        </div>
+      </div>
+
+      <!-- Branch Specific Projects List -->
+      <div class="sidebar-section" style="flex: 1;">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fa-solid fa-folder-tree"></i> 지부별 세부 사업장 목록
+          </div>
+          <span class="section-badge" id="projects-count-badge" style="color: var(--accent-cyan);">10개 사업 운영 중</span>
+        </div>
+        
+        <div id="branch-projects-container">
+          <!-- Populated by branch-manager.js -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER STAGE: National 3D Satellite Map & HUD -->
+    <section class="center-stage">
+      <div id="map-viewport" class="map-viewport"></div>
+
+      <!-- Real-time Tactical Center Sight -->
+      <div class="map-center-sight">
+        <div class="sight-ring"></div>
+        <div class="sight-line top"></div>
+        <div class="sight-line bottom"></div>
+        <div class="sight-line left"></div>
+        <div class="sight-line right"></div>
+        <div class="sight-dot"></div>
+        <div class="sight-tag" id="sight-coord-tag">36.350412° N, 127.384548° E</div>
+      </div>
+
+      <!-- Tactical HUD Overlay -->
+      <div class="map-hud-overlay">
+        <div class="top-hud-bar">
+          <div class="hud-pill">
+            <i class="fa-solid fa-satellite-dish text-cyan"></i> 전국 9개 지부 드론 GIS 통합 관제 모드
+          </div>
+        </div>
+
+        <div class="telemetry-wing">
+          <div class="tele-row"><span>위도:</span> <b id="hud-lat">36.350412° N</b></div>
+          <div class="tele-row"><span>경도:</span> <b id="hud-lon">127.384548° E</b></div>
+          <div class="tele-row"><span>고도:</span> <b id="hud-alt">850m</b></div>
+          <div class="tele-row"><span>방위:</span> <b id="hud-hdg">HDG 000°</b></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT SIDEBAR: National KPIs, Charts & Activity Feed -->
+    <aside class="sidebar right-sidebar">
+      
+      <!-- KPI Stats Grid -->
+      <div class="sidebar-section">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fa-solid fa-chart-line"></i> 전국 종합 사업 실적 롤업
+          </div>
+          <span class="section-badge" style="color: var(--accent-amber);">실시간 집계</span>
+        </div>
+        
+        <div class="kpi-grid">
+          <div class="kpi-box primary">
+            <span class="kpi-label">전국 총 누적 작업면적</span>
+            <span class="kpi-val"><span id="kpi-total-area">377,000</span> <small>㎡</small></span>
+          </div>
+          <div class="kpi-box emerald">
+            <span class="kpi-label">전국 총 교란종 수거량</span>
+            <span class="kpi-val"><span id="kpi-total-harvest">5,250</span> <small>kg</small></span>
+          </div>
+          <div class="kpi-box amber">
+            <span class="kpi-label">전국 총 운영 사업수</span>
+            <span class="kpi-val"><span id="kpi-active-projects">10</span> <small>개 사업</small></span>
+          </div>
+          <div class="kpi-box purple">
+            <span class="kpi-label">전국 지부 가동 현황</span>
+            <span class="kpi-val" style="font-size: 0.85rem; color: #a855f7;"><span id="kpi-active-branches">9개 지부 전원 활성</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-time Comparison Charts -->
+      <div class="sidebar-section">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fa-solid fa-chart-bar"></i> 9개 지부 실적 & 교란종 분석
+          </div>
+        </div>
+        
+        <div class="chart-container" style="height: 160px; margin-bottom: 8px;">
+          <canvas id="branchComparisonChart"></canvas>
+        </div>
+
+        <div class="chart-container" style="height: 120px;">
+          <canvas id="speciesDistributionChart"></canvas>
+        </div>
+      </div>
+
+      <!-- National Activity Feed -->
+      <div class="sidebar-section" style="flex: 1;">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fa-solid fa-clock-rotate-left"></i> 전국 지부 실시간 현장 일지
+          </div>
+        </div>
+        <div class="activity-feed" id="recent-activities-container">
+          <!-- Populated by analytics.js -->
+        </div>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- App Modules -->
+  <script src="map-controller.js?v=20260819_01"></script>
+  <script src="branch-manager.js?v=20260819_01"></script>
+  <script src="analytics.js?v=20260819_01"></script>
+  <script src="app.js?v=20260819_01"></script>
+</body>
+</html>

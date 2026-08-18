@@ -1,0 +1,72 @@
+[
+  {
+    "id": "act-20260818-01",
+    "branch_id": "daejeon-chungnam-sejong",
+    "branch_name": "대전·충남·세종 지부",
+    "project_title": "금강 천내리습지 가시박 제거사업",
+    "date": "2026-08-18",
+    "work_type": "드론 모니터링 및 잔존 개체 예찰",
+    "worker_count": 8,
+    "area_m2": 66000,
+    "harvest_kg": 0,
+    "location": "천내리습지 1·2·3구간 전체",
+    "summary": "1·2차 물리적 제거 완료 후 드론 정사영상 촬영을 통한 잔존 가시박 재발아 여부 정밀 확인 및 지속 관리 중",
+    "status": "완료"
+  },
+  {
+    "id": "act-20260817-02",
+    "branch_id": "seoul-gyeonggi",
+    "branch_name": "서울·인천·경기 지부",
+    "project_title": "팔당호 수계 가시박 구제사업",
+    "date": "2026-08-17",
+    "work_type": "수변 예초 및 뿌리굴취",
+    "worker_count": 12,
+    "area_m2": 4500,
+    "harvest_kg": 95,
+    "location": "양평 양수리 수변 산책로 2구역",
+    "summary": "팔당 상수원 유입 하천변 단풍잎돼지풀 및 가시박 군락 집중 예초 및 수거 마대 이송",
+    "status": "완료"
+  },
+  {
+    "id": "act-20260816-03",
+    "branch_id": "daegu-gyeongbuk",
+    "branch_name": "대구·경북 지부",
+    "project_title": "낙동강 왜관지구 가시박 제거",
+    "date": "2026-08-16",
+    "work_type": "둔치 덩굴류 절단 및 드론 촬영",
+    "worker_count": 10,
+    "area_m2": 5200,
+    "harvest_kg": 120,
+    "location": "경북 칠곡 왜관읍 낙동강 둔치",
+    "summary": "고수부지 수목 피복 가시박 줄기 절단 및 드론 열화상/RGB 매핑을 통한 확산 경계면 조사",
+    "status": "완료"
+  },
+  {
+    "id": "act-20260814-04",
+    "branch_id": "busan-ulsan-gyeongnam",
+    "branch_name": "부산·울산·경남 지부",
+    "project_title": "을숙도 뉴트리아·가시박 퇴치",
+    "date": "2026-08-14",
+    "work_type": "인공트랩 회수 및 하구 정비",
+    "worker_count": 6,
+    "area_m2": 3200,
+    "harvest_kg": 65,
+    "location": "부산 사하구 을숙도 습지보호지역",
+    "summary": "을숙도 남단 인공트랩 점검 및 뉴트리아 4개체 포획, 주변 양미역풀 군락 수거",
+    "status": "완료"
+  },
+  {
+    "id": "act-20260812-05",
+    "branch_id": "gangwon",
+    "branch_name": "강원 지부",
+    "project_title": "소양호 수계 교란생물 복합 퇴치",
+    "date": "2026-08-12",
+    "work_type": "선박 이용 수변 덩굴 제거",
+    "worker_count": 7,
+    "area_m2": 2800,
+    "harvest_kg": 75,
+    "location": "춘천 북산면 소양호 지류 유입부",
+    "summary": "선박 접근을 통한 가파른 수변 절벽지 가시박 줄기 굴취 및 인공 산란상 15기 회수",
+    "status": "완료"
+  }
+]
