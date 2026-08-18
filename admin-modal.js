@@ -204,7 +204,7 @@ class AdminModalManager {
       branch_id: branchId,
       branch_name: branch.name,
       title: title,
-      client: client || '환경부',
+      client: client || '기후부',
       organizer: `(사)야생생물관리협회 ${branch.short_name}`,
       status: 'ongoing',
       status_label: '신규 사업 착수',

@@ -8,8 +8,8 @@ class DataStore {
     this.branches = [];
     this.projects = [];
     this.activities = [];
-    this.STORAGE_KEY_PROJECTS = 'wma_ecosystem_projects_v1';
-    this.STORAGE_KEY_ACTIVITIES = 'wma_ecosystem_activities_v1';
+    this.STORAGE_KEY_PROJECTS = 'wma_ecosystem_projects_v2';
+    this.STORAGE_KEY_ACTIVITIES = 'wma_ecosystem_activities_v2';
   }
 
   async loadInitialData() {
