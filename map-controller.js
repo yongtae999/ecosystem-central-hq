@@ -1,6 +1,7 @@
 /**
- * National Map Controller Module (MapLibre GL JS 3D Satellite)
+ * National Map Controller Module (MapLibre GL JS Satellite Engine)
  * Visualizes 9 Official Branches & National Invasive Species Removal Projects
+ * Zero-Drift Pinning & Precision Geodetic Calibration
  */
 
 class MapController {
@@ -18,42 +19,42 @@ class MapController {
     this.branches = branchesData || [];
     this.projects = projectsData || [];
 
-    // Korea National Center Overview
-    const koreaCenter = [127.7669, 36.3504];
+    // Korea National Center Overview (Daejeon/Sejong Center)
+    const koreaCenter = [127.5000, 36.4000];
 
     this.map = new maplibregl.Map({
       container: this.containerId,
       style: {
         version: 8,
         sources: {
-          'google-satellite': {
+          'satellite-tiles': {
             type: 'raster',
             tiles: [
-              'https://mt0.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',
-              'https://mt1.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',
-              'https://mt2.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',
-              'https://mt3.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}'
+              'https://mt0.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+              'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+              'https://mt2.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+              'https://mt3.google.com/vt/lyrs=y&x={x}&y={y}&z={z}'
             ],
             tileSize: 256,
-            maxzoom: 22
+            maxzoom: 20
           }
         },
         layers: [
           {
             id: 'satellite-layer',
             type: 'raster',
-            source: 'google-satellite',
+            source: 'satellite-tiles',
             minzoom: 0,
-            maxzoom: 24,
+            maxzoom: 22,
             paint: {
-              'raster-resampling': 'linear',
-              'raster-opacity': 1.0
+              'raster-opacity': 1.0,
+              'raster-resampling': 'linear'
             }
           }
         ]
       },
       center: koreaCenter,
-      zoom: 7.2,
+      zoom: 7.4,
       pitch: 0,
       bearing: 0,
       maxPitch: 85,
@@ -82,7 +83,7 @@ class MapController {
     }
     this.markers = [];
 
-    // 1. Render 9 Branch Center Markers (Zero-drift Pinned)
+    // 1. Render 9 Official Branch Pins (Zero-Drift Pinned)
     this.branches.forEach(branch => {
       const el = document.createElement('div');
       el.className = 'hq-marker-pin';
@@ -91,7 +92,7 @@ class MapController {
       const isActive = branch.status === 'active';
 
       el.innerHTML = `
-        <div class="hq-marker-icon" style="${isActive ? 'border-color: #38bdf8; color: #38bdf8;' : 'border-color: #94a3b8; color: #94a3b8;'}" title="${branch.name}">
+        <div class="hq-marker-icon" style="${isActive ? 'border-color: #38bdf8; color: #38bdf8; background: #0c121d;' : 'border-color: #94a3b8; color: #94a3b8; background: #0c121d;'}" title="${branch.name}">
           <i class="fa-solid fa-building-flag"></i>
         </div>
         <div class="hq-marker-label" style="${isActive ? 'border-color: #38bdf8; color: #38bdf8;' : 'border-color: rgba(255,255,255,0.2); color: #cbd5e1;'}">
@@ -129,7 +130,7 @@ class MapController {
       this.markers.push(marker);
     });
 
-    // 2. Render Project Specific Pinpoints (Geumgang Cheonnae-ri, Doowoong Wetland)
+    // 2. Render Project Specific Pinpoints (Geumgang Cheonnae-ri, Taean Doowoong Wetland)
     this.projects.forEach(proj => {
       const el = document.createElement('div');
       el.className = 'hq-marker-pin';
@@ -137,7 +138,7 @@ class MapController {
       const isGeumgang = proj.id === 'proj-dcs-geumgang-01';
 
       el.innerHTML = `
-        <div class="hq-marker-icon" style="${isGeumgang ? 'border-color: #10b981; color: #10b981;' : 'border-color: #fbbf24; color: #fbbf24;'}">
+        <div class="hq-marker-icon" style="${isGeumgang ? 'border-color: #10b981; color: #10b981; background: #061e12;' : 'border-color: #fbbf24; color: #fbbf24; background: #1f1402;'}">
           <i class="fa-solid ${isGeumgang ? 'fa-crosshairs' : 'fa-seedling'}"></i>
         </div>
         <div class="hq-marker-label" style="${isGeumgang ? 'border-color: #10b981; color: #34d399;' : 'border-color: #fbbf24; color: #fbbf24;'}">
@@ -184,7 +185,7 @@ class MapController {
       zoom: branch.zoom || 15.5,
       pitch: 0,
       bearing: 0,
-      duration: 2000,
+      duration: 1800,
       essential: true
     });
   }
@@ -195,21 +196,21 @@ class MapController {
 
     this.map.flyTo({
       center: [proj.lng, proj.lat],
-      zoom: proj.zoom || 15.5,
+      zoom: proj.zoom || 16.2,
       pitch: 0,
       bearing: 0,
-      duration: 2200,
+      duration: 1800,
       essential: true
     });
   }
 
   flyToNationalOverview() {
     this.map.flyTo({
-      center: [127.7669, 36.3504],
-      zoom: 7.2,
+      center: [127.5000, 36.4000],
+      zoom: 7.4,
       pitch: 0,
       bearing: 0,
-      duration: 2200,
+      duration: 1800,
       essential: true
     });
   }
