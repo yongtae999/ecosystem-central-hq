@@ -545,53 +545,114 @@ body {
   white-space: nowrap;
 }
 
-/* Map Markers (Geometric Center Zero-Drift Pinned) */
-.hq-marker-wrapper {
+/* Map Markers (Zero-Drift Fixed Needle Pin - Anchor: Bottom) */
+.hq-needle-marker {
+  width: 96px;
+  height: 48px;
   position: relative;
-  width: 28px;
-  height: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   cursor: pointer;
   pointer-events: auto;
   user-select: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.hq-marker-icon {
-  width: 28px;
-  height: 28px;
-  background: rgba(6, 9, 14, 0.95);
-  border: 2px solid var(--accent-cyan);
+.needle-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+  margin-bottom: 2px;
+}
+
+.needle-label.hq {
+  background: #1c1402;
+  border: 1px solid #fbbf24;
+  color: #fde047;
+}
+
+.needle-label.active {
+  background: #082f49;
+  border: 1px solid #38bdf8;
+  color: #38bdf8;
+}
+
+.needle-label.standby {
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #cbd5e1;
+}
+
+.needle-label.project {
+  background: #061e12;
+  border: 1px solid #10b981;
+  color: #34d399;
+}
+
+.needle-circle {
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent-cyan);
-  font-size: 0.78rem;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
-  transition: transform 0.15s ease, background 0.15s ease;
+  font-size: 0.7rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  z-index: 2;
 }
 
-.hq-marker-wrapper:hover .hq-marker-icon {
-  transform: scale(1.25);
+.needle-circle.hq {
+  background: #fbbf24;
+  color: #000;
+  border: 2px solid #ffffff;
 }
 
-.hq-marker-label {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(6, 9, 14, 0.92);
-  border: 1px solid rgba(56, 189, 248, 0.5);
-  color: #f8fafc;
-  font-size: 0.68rem;
-  font-weight: 700;
-  padding: 1px 6px;
-  border-radius: 3px;
-  white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
-  pointer-events: none;
+.needle-circle.active {
+  background: #0284c7;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+}
+
+.needle-circle.standby {
+  background: #475569;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+}
+
+.needle-circle.project {
+  background: #10b981;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+}
+
+.needle-point {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  margin-top: -1px;
+  z-index: 1;
+}
+
+.needle-point.hq {
+  border-top: 6px solid #fbbf24;
+}
+
+.needle-point.active {
+  border-top: 6px solid #0284c7;
+}
+
+.needle-point.standby {
+  border-top: 6px solid #475569;
+}
+
+.needle-point.project {
+  border-top: 6px solid #10b981;
 }
 
 /* ===================================================================
