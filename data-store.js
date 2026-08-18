@@ -1,6 +1,7 @@
 /**
  * Central Data Store & Persistence Module
  * Manages dynamic Projects and Activity Logs via LocalStorage + Seed JSON
+ * Always ensures official seed coordinates are 100% synchronized with latest server data
  */
 
 class DataStore {
@@ -8,36 +9,59 @@ class DataStore {
     this.branches = [];
     this.projects = [];
     this.activities = [];
-    this.STORAGE_KEY_PROJECTS = 'wma_ecosystem_projects_v2';
-    this.STORAGE_KEY_ACTIVITIES = 'wma_ecosystem_activities_v2';
+    this.STORAGE_KEY_PROJECTS = 'wma_ecosystem_projects_v3';
+    this.STORAGE_KEY_ACTIVITIES = 'wma_ecosystem_activities_v3';
   }
 
   async loadInitialData() {
     const t = Date.now();
     try {
-      // 1. Branches Seed Data
+      // 1. Branches Seed Data (Always fresh from server)
       const bRes = await fetch(`data/branches.json?t=${t}`);
       this.branches = await bRes.json();
 
-      // 2. Projects Data (LocalStorage merge with seed)
-      const localProjects = localStorage.getItem(this.STORAGE_KEY_PROJECTS);
-      if (localProjects) {
-        this.projects = JSON.parse(localProjects);
-      } else {
-        const pRes = await fetch(`data/projects.json?t=${t}`);
-        this.projects = await pRes.json();
-        this.saveProjects();
-      }
+      // 2. Projects Data (Fetch seed projects from server first)
+      const pRes = await fetch(`data/projects.json?t=${t}`);
+      const seedProjects = await pRes.json();
 
-      // 3. Activities Data (LocalStorage merge with seed)
-      const localActivities = localStorage.getItem(this.STORAGE_KEY_ACTIVITIES);
-      if (localActivities) {
-        this.activities = JSON.parse(localActivities);
+      // Merge with user-created dynamic projects from LocalStorage
+      const localProjectsRaw = localStorage.getItem(this.STORAGE_KEY_PROJECTS);
+      if (localProjectsRaw) {
+        try {
+          const localProjects = JSON.parse(localProjectsRaw);
+          // Filter out seed projects from local, keep user-added projects
+          const userAddedProjects = localProjects.filter(lp => 
+            !seedProjects.some(sp => sp.id === lp.id)
+          );
+          // Combine fresh seed projects with user added projects
+          this.projects = [...seedProjects, ...userAddedProjects];
+        } catch (e) {
+          this.projects = seedProjects;
+        }
       } else {
-        const aRes = await fetch(`data/national_activities.json?t=${t}`);
-        this.activities = await aRes.json();
-        this.saveActivities();
+        this.projects = seedProjects;
       }
+      this.saveProjects();
+
+      // 3. Activities Data (Fetch seed activities from server)
+      const aRes = await fetch(`data/national_activities.json?t=${t}`);
+      const seedActivities = await aRes.json();
+
+      const localActivitiesRaw = localStorage.getItem(this.STORAGE_KEY_ACTIVITIES);
+      if (localActivitiesRaw) {
+        try {
+          const localActs = JSON.parse(localActivitiesRaw);
+          const userAddedActs = localActs.filter(la => 
+            !seedActivities.some(sa => sa.id === la.id)
+          );
+          this.activities = [...seedActivities, ...userAddedActs];
+        } catch (e) {
+          this.activities = seedActivities;
+        }
+      } else {
+        this.activities = seedActivities;
+      }
+      this.saveActivities();
 
       this.recalculateBranchStats();
       return {
@@ -67,7 +91,9 @@ class DataStore {
       b.active_projects_count = 0;
       b.total_work_area_m2 = 0;
       b.total_harvest_kg = 0;
-      b.status = 'standby';
+      if (!b.is_hq) {
+        b.status = 'standby';
+      }
     });
 
     // Accumulate from projects
@@ -75,8 +101,8 @@ class DataStore {
       const b = this.branches.find(br => br.id === p.branch_id);
       if (b) {
         b.active_projects_count += 1;
-        b.total_work_area_m2 += (p.total_area_m2 || 0);
-        b.total_harvest_kg += (p.total_harvest_kg || 0);
+        b.total_work_area_m2 += (Number(p.total_area_m2) || 0);
+        b.total_harvest_kg += (Number(p.total_harvest_kg) || 0);
         b.status = 'active';
       }
     });
@@ -96,8 +122,8 @@ class DataStore {
     // Update project stats if specified
     const proj = this.projects.find(p => p.id === newAct.project_id);
     if (proj) {
-      if (newAct.area_m2) proj.total_area_m2 = (proj.total_area_m2 || 0) + Number(newAct.area_m2);
-      if (newAct.harvest_kg) proj.total_harvest_kg = (proj.total_harvest_kg || 0) + Number(newAct.harvest_kg);
+      if (newAct.area_m2) proj.total_area_m2 = (Number(proj.total_area_m2) || 0) + Number(newAct.area_m2);
+      if (newAct.harvest_kg) proj.total_harvest_kg = (Number(proj.total_harvest_kg) || 0) + Number(newAct.harvest_kg);
       this.saveProjects();
     }
 
@@ -124,6 +150,10 @@ class DataStore {
   resetToDefault() {
     localStorage.removeItem(this.STORAGE_KEY_PROJECTS);
     localStorage.removeItem(this.STORAGE_KEY_ACTIVITIES);
+    localStorage.removeItem('wma_ecosystem_projects_v1');
+    localStorage.removeItem('wma_ecosystem_projects_v2');
+    localStorage.removeItem('wma_ecosystem_activities_v1');
+    localStorage.removeItem('wma_ecosystem_activities_v2');
     window.location.reload();
   }
 }
