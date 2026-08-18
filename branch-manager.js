@@ -47,7 +47,7 @@ class BranchManager {
 
     container.innerHTML = '';
 
-    this.branches.forEach((branch) => {
+    this.branches.filter(b => !b.is_hq).forEach((branch) => {
       const card = document.createElement('div');
       const isActive = branch.status === 'active';
       card.className = `branch-card ${this.activeBranchId === branch.id ? 'active' : ''}`;
