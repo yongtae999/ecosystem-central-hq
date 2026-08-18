@@ -1,5 +1,25 @@
 [
   {
+    "id": "hq",
+    "is_hq": true,
+    "name": "(사)야생생물관리협회 중앙사무국 (본부)",
+    "short_name": "중앙사무국(본부)",
+    "region_code": "HQ",
+    "lat": 37.625682,
+    "lng": 127.123281,
+    "zoom": 16.0,
+    "address": "경기도 구리시 산마루로 19 진영트윈타워A동 601호 (갈매동 605-2) (우: 11901)",
+    "tel": "02-911-0000",
+    "fax": "02-432-1120",
+    "leader": "회장 송재언 / 부회장 김철훈",
+    "manager": "사무국장 이명재 / 부장 이지선",
+    "status": "hq",
+    "active_projects_count": 0,
+    "total_work_area_m2": 98000,
+    "total_harvest_kg": 1290,
+    "desc": "전국 9개 지부 생태계교란생물 제거사업 총괄 기획 및 실적 통합 관제 HQ"
+  },
+  {
     "id": "daejeon-chungnam-sejong",
     "name": "대전·충남·세종 지부",
     "short_name": "대전충남세종",

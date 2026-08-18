@@ -1,6 +1,6 @@
 /**
  * National Map Controller Module (MapLibre GL JS Native Vector & Hybrid Satellite Engine)
- * WebGL-Native Zero-Offset Geodetic Rendering for 9 Branches & Projects
+ * WebGL-Native Zero-Offset Geodetic Rendering for Central HQ, 9 Branches & Projects
  */
 
 class MapController {
@@ -76,7 +76,7 @@ class MapController {
   }
 
   setupNativeVectorLayers() {
-    // 1. Build GeoJSON for 9 Branches
+    // 1. Build GeoJSON for Central HQ & 9 Branches
     const branchGeoJson = {
       type: 'FeatureCollection',
       features: this.branches.map(b => ({
@@ -87,10 +87,12 @@ class MapController {
         },
         properties: {
           id: b.id,
+          is_hq: b.is_hq ? 1 : 0,
           name: b.name,
           short_name: b.short_name,
           address: b.address,
           tel: b.tel,
+          leader: b.leader || '',
           manager: b.manager,
           status: b.status,
           active_projects_count: b.active_projects_count,
@@ -140,9 +142,14 @@ class MapController {
       type: 'circle',
       source: 'branches-src',
       paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 6, 12, 10, 18, 16, 26],
-        'circle-color': '#0284c7',
-        'circle-opacity': 0.35,
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 6, 12, 10, 18, 16, 28],
+        'circle-color': [
+          'case',
+          ['==', ['get', 'is_hq'], 1],
+          '#fbbf24',
+          '#0284c7'
+        ],
+        'circle-opacity': 0.45,
         'circle-blur': 0.5
       }
     });
@@ -153,14 +160,16 @@ class MapController {
       type: 'circle',
       source: 'branches-src',
       paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 6, 6, 10, 9, 16, 12],
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 6, 6, 10, 9, 16, 13],
         'circle-color': [
           'case',
+          ['==', ['get', 'is_hq'], 1],
+          '#fbbf24',
           ['==', ['get', 'status'], 'active'],
           '#38bdf8',
           '#94a3b8'
         ],
-        'circle-stroke-width': 2,
+        'circle-stroke-width': 2.5,
         'circle-stroke-color': '#ffffff'
       }
     });
@@ -171,7 +180,12 @@ class MapController {
       type: 'symbol',
       source: 'branches-src',
       layout: {
-        'text-field': ['get', 'short_name'],
+        'text-field': [
+          'case',
+          ['==', ['get', 'is_hq'], 1],
+          '🏛️ 중앙사무국(본부)',
+          ['get', 'short_name']
+        ],
         'text-size': ['interpolate', ['linear'], ['zoom'], 6, 10, 10, 12, 16, 14],
         'text-offset': [0, 1.2],
         'text-anchor': 'top',
@@ -180,7 +194,12 @@ class MapController {
         'text-ignore-placement': true
       },
       paint: {
-        'text-color': '#ffffff',
+        'text-color': [
+          'case',
+          ['==', ['get', 'is_hq'], 1],
+          '#fde047',
+          '#ffffff'
+        ],
         'text-halo-color': '#020617',
         'text-halo-width': 2.5
       }
@@ -281,16 +300,19 @@ class MapController {
 
   showBranchPopup(feature, lngLat) {
     const p = feature.properties;
+    const isHq = p.is_hq === 1;
     const isActive = p.status === 'active';
     const coords = feature.geometry.coordinates;
 
     const html = `
-      <div style="padding: 8px; font-family: -apple-system, sans-serif; min-width: 200px;">
-        <div style="font-size: 0.9rem; font-weight: 800; color: #38bdf8; margin-bottom: 4px;">🏛️ ${p.name}</div>
+      <div style="padding: 8px; font-family: -apple-system, sans-serif; min-width: 220px;">
+        <div style="font-size: 0.9rem; font-weight: 800; color: ${isHq ? '#fbbf24' : '#38bdf8'}; margin-bottom: 4px;">
+          ${isHq ? '🏛️ (사)야생생물관리협회 중앙사무국 (본부)' : '🏛️ ' + p.name}
+        </div>
         <div style="font-size: 0.75rem; color: #cbd5e1; line-height: 1.4; margin-bottom: 4px;">📍 ${p.address}</div>
         <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px;">📞 ${p.tel} / 👤 ${p.manager}</div>
-        <div style="font-size: 0.72rem; font-weight: 700; color: ${isActive ? '#34d399' : '#94a3b8'}; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 4px;">
-          ${isActive ? `● 활성 사업: ${p.active_projects_count}건 운영 중` : '○ 사업 연동 대기'}
+        <div style="font-size: 0.72rem; font-weight: 700; color: ${isHq ? '#fbbf24' : (isActive ? '#34d399' : '#94a3b8')}; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 4px;">
+          ${isHq ? '👑 전국 9개 지부 총괄 기획 및 통합 관제 HQ' : (isActive ? `● 활성 사업: ${p.active_projects_count}건 운영 중` : '○ 사업 연동 대기')}
         </div>
       </div>
     `;
