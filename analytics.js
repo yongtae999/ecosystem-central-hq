@@ -24,11 +24,11 @@ class AnalyticsManager {
     let totalArea = 0;
     let totalHarvest = 0;
     let totalProjects = projects.length;
-    let activeBranchesCount = branches.filter(b => b.status === 'active').length;
 
-    branches.forEach(b => {
-      totalArea += (b.total_work_area_m2 || 0);
-      totalHarvest += (b.total_harvest_kg || 0);
+    // Sum projects stats
+    projects.forEach(p => {
+      totalArea += (p.total_area_m2 || 0);
+      totalHarvest += (p.total_harvest_kg || 0);
     });
 
     if (totalAreaEl) totalAreaEl.textContent = (totalArea).toLocaleString();
@@ -38,14 +38,17 @@ class AnalyticsManager {
   }
 
   renderCharts(branches, projects) {
-    // 1. 9 Branches Performance Comparison Horizontal Bar Chart
+    // Filter official 9 branches (excluding HQ node)
+    const officialBranches = branches.filter(b => !b.is_hq);
+
+    // 1. 9 Official Branches Performance Comparison Horizontal Bar Chart
     const ctx1 = document.getElementById('branchComparisonChart');
-    if (ctx1 && branches && branches.length) {
+    if (ctx1 && officialBranches.length) {
       if (this.branchChart) this.branchChart.destroy();
 
-      const labels = branches.map(b => b.short_name);
-      const areaData = branches.map(b => Math.round((b.total_work_area_m2 || 0) / 1000)); // in 1,000 m2
-      const harvestData = branches.map(b => b.total_harvest_kg || 0);
+      const labels = officialBranches.map(b => b.short_name);
+      const areaData = officialBranches.map(b => (b.total_work_area_m2 || 0) / 1000); // in 1,000 m2
+      const harvestData = officialBranches.map(b => b.total_harvest_kg || 0);
 
       this.branchChart = new Chart(ctx1, {
         type: 'bar',
@@ -53,16 +56,22 @@ class AnalyticsManager {
           labels: labels,
           datasets: [
             {
-              label: '누적 면적 (천㎡)',
+              label: '작업면적 (천㎡)',
               data: areaData,
-              backgroundColor: 'rgba(56, 189, 248, 0.8)',
-              borderRadius: 3
+              backgroundColor: 'rgba(56, 189, 248, 0.85)',
+              borderColor: '#38bdf8',
+              borderWidth: 1,
+              borderRadius: 3,
+              barThickness: 7
             },
             {
               label: '수거량 (kg)',
               data: harvestData,
-              backgroundColor: 'rgba(16, 185, 129, 0.8)',
-              borderRadius: 3
+              backgroundColor: 'rgba(16, 185, 129, 0.85)',
+              borderColor: '#10b981',
+              borderWidth: 1,
+              borderRadius: 3,
+              barThickness: 7
             }
           ]
         },
@@ -70,20 +79,45 @@ class AnalyticsManager {
           indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
+          layout: {
+            padding: { top: 0, bottom: 0, left: 0, right: 10 }
+          },
           plugins: {
             legend: {
-              labels: { color: '#94a3b8', font: { size: 9 } }
+              position: 'top',
+              labels: {
+                color: '#cbd5e1',
+                font: { size: 9, weight: '600' },
+                boxWidth: 10,
+                padding: 6
+              }
             },
-            title: {
-              display: true,
-              text: '9개 지부별 실시간 누적 작업 실적 현황',
-              color: '#f8fafc',
-              font: { size: 10, weight: 'bold' }
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.dataset.label || '';
+                  if (context.datasetIndex === 0) {
+                    return `${label}: ${(context.raw * 1000).toLocaleString()} ㎡`;
+                  } else {
+                    return `${label}: ${(context.raw).toLocaleString()} kg`;
+                  }
+                }
+              }
             }
           },
           scales: {
-            x: { ticks: { color: '#64748b', font: { size: 8 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
-            y: { ticks: { color: '#cbd5e1', font: { size: 8 } }, grid: { display: false } }
+            x: {
+              ticks: { color: '#64748b', font: { size: 8 } },
+              grid: { color: 'rgba(255,255,255,0.05)' }
+            },
+            y: {
+              ticks: {
+                color: '#f1f5f9',
+                font: { size: 9, weight: '700' },
+                autoSkip: false
+              },
+              grid: { display: false }
+            }
           }
         }
       });
@@ -115,8 +149,9 @@ class AnalyticsManager {
             title: {
               display: true,
               text: '실측 교란식물종별 방제 구성비 (%)',
-              color: '#f8fafc',
-              font: { size: 10, weight: 'bold' }
+              color: '#94a3b8',
+              font: { size: 9, weight: 'bold' },
+              padding: { top: 0, bottom: 4 }
             }
           }
         }
