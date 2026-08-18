@@ -1,6 +1,6 @@
 /**
  * Branch & Project Manager Module
- * Manages Central HQ, 9 Official WMA Branches, Multi-Project Navigation & Deep-links
+ * Manages 9 Official WMA Branches, Multi-Project Navigation & Deep-links
  */
 
 class BranchManager {
@@ -8,7 +8,7 @@ class BranchManager {
     this.mapCtrl = mapController;
     this.branches = [];
     this.projects = [];
-    this.activeBranchId = 'all'; // 'all', 'hq', or specific branch id
+    this.activeBranchId = 'all'; // 'all' or specific branch id
   }
 
   init(branchesData, projectsData) {
@@ -49,23 +49,17 @@ class BranchManager {
 
     this.branches.forEach((branch) => {
       const card = document.createElement('div');
-      const isHq = branch.is_hq === true;
       const isActive = branch.status === 'active';
       card.className = `branch-card ${this.activeBranchId === branch.id ? 'active' : ''}`;
       card.dataset.id = branch.id;
 
-      if (isHq) {
-        card.style.borderColor = 'rgba(251, 191, 36, 0.4)';
-        card.style.background = 'rgba(30, 24, 10, 0.7)';
-      }
-
       card.innerHTML = `
         <div class="branch-card-header">
-          <span class="branch-name" style="${isHq ? 'color: #fde047;' : ''}">
-            ${isHq ? '👑 ' + branch.name : '🏛️ ' + branch.name}
+          <span class="branch-name">
+            🏛️ ${branch.name}
           </span>
-          <span class="branch-status-pill" style="${isHq ? 'background: rgba(251, 191, 36, 0.2); color: #fbbf24; border-color: rgba(251, 191, 36, 0.4);' : (isActive ? '' : 'background: rgba(148, 163, 184, 0.15); color: #94a3b8; border-color: rgba(148, 163, 184, 0.3);')}">
-            ${isHq ? '중앙사무국 본부' : (isActive ? `사업 ${branch.active_projects_count}건 운영` : '연동 준비 중')}
+          <span class="branch-status-pill" style="${isActive ? '' : 'background: rgba(148, 163, 184, 0.15); color: #94a3b8; border-color: rgba(148, 163, 184, 0.3);'}">
+            ${isActive ? `사업 ${branch.active_projects_count}건 운영` : '연동 준비 중'}
           </span>
         </div>
         <div class="branch-meta">
@@ -74,8 +68,8 @@ class BranchManager {
           👤 ${branch.manager}
         </div>
         <div class="branch-stats-row">
-          <span>${isHq ? '총괄 관제:' : '작업면적:'} <b style="${isHq ? 'color: #fde047;' : ''}">${isHq ? '전국 9개 지부' : (isActive ? (branch.total_work_area_m2).toLocaleString() + ' ㎡' : '-')}</b></span>
-          <span>${isHq ? '실적집계:' : '수거량:'} <b style="color: ${isHq ? '#fbbf24' : (isActive ? '#34d399' : '#94a3b8')};">${isHq ? '실시간 롤업' : (isActive ? (branch.total_harvest_kg).toLocaleString() + ' kg' : '-')}</b></span>
+          <span>작업면적: <b>${isActive ? (branch.total_work_area_m2).toLocaleString() + ' ㎡' : '-'}</b></span>
+          <span>수거량: <b style="color: ${isActive ? '#34d399' : '#94a3b8'};">${isActive ? (branch.total_harvest_kg).toLocaleString() + ' kg' : '-'}</b></span>
         </div>
       `;
 
@@ -95,10 +89,7 @@ class BranchManager {
     container.innerHTML = '';
 
     let list = this.projects;
-    if (this.activeBranchId === 'hq') {
-      // HQ shows all projects
-      list = this.projects;
-    } else if (this.activeBranchId !== 'all') {
+    if (this.activeBranchId !== 'all') {
       list = list.filter(p => p.branch_id === this.activeBranchId);
     }
 

@@ -52,8 +52,7 @@
       <div class="branch-select-wrap">
         <i class="fa-solid fa-location-crosshairs"></i>
         <select id="branch-dropdown-select" class="branch-dropdown">
-          <option value="all" selected>🌐 전국 9개 지부 전체 관제</option>
-          <option value="hq">👑 중앙사무국 본부 (구리시 HQ)</option>
+          <option value="all" selected>🌐 전국 9개 지부 전체 (합계)</option>
           <option value="daejeon-chungnam-sejong">📍 대전·충남·세종 지부 (천내리·두웅습지)</option>
           <option value="seoul-gyeonggi">📍 서울·인천·경기 지부 (포천)</option>
           <option value="gangwon">📍 강원 지부 (원주)</option>
@@ -86,66 +85,77 @@
       <div class="sidebar-section">
         <div class="section-header">
           <div class="section-title">
-            <i class="fa-solid fa-sitemap"></i> 전국 9개 시·도 지부 현황
+            <i class="fa-solid fa-building-flag"></i> 전국 9개 공식 지부
           </div>
-          <span class="section-badge" style="color: var(--accent-emerald);">9개 지부 정규 가동</span>
+          <span class="section-badge">실시간 연동</span>
         </div>
+        
         <div class="branch-grid" id="branch-cards-container">
           <!-- Populated by branch-manager.js -->
         </div>
       </div>
 
-      <!-- Branch Specific Projects List -->
+      <!-- Branch Active Projects & Deep-links -->
       <div class="sidebar-section" style="flex: 1;">
         <div class="section-header">
           <div class="section-title">
-            <i class="fa-solid fa-folder-tree"></i> 지부별 세부 사업장 목록
+            <i class="fa-solid fa-folder-tree"></i> 지부별 제거사업 목록
           </div>
-          <span class="section-badge" id="projects-count-badge" style="color: var(--accent-cyan);">10개 사업 운영 중</span>
+          <span class="section-badge" id="projects-count-badge">운영 중</span>
         </div>
-        
-        <div id="branch-projects-container">
+
+        <div class="project-list" id="branch-projects-container">
           <!-- Populated by branch-manager.js -->
         </div>
       </div>
     </aside>
 
-    <!-- CENTER STAGE: National 3D Satellite Map & HUD -->
-    <section class="center-stage">
-      <div id="map-viewport" class="map-viewport"></div>
-
-      <!-- Real-time Tactical Center Sight -->
-      <div class="map-center-sight">
-        <div class="sight-ring"></div>
-        <div class="sight-line top"></div>
-        <div class="sight-line bottom"></div>
-        <div class="sight-line left"></div>
-        <div class="sight-line right"></div>
-        <div class="sight-dot"></div>
-        <div class="sight-tag" id="sight-coord-tag">36.350412° N, 127.384548° E</div>
-      </div>
+    <!-- CENTER STAGE: 3D Map + HUD Overlay -->
+    <section class="map-container">
+      <div id="map-viewport"></div>
 
       <!-- Tactical HUD Overlay -->
-      <div class="map-hud-overlay">
-        <div class="top-hud-bar">
-          <div class="hud-pill">
-            <i class="fa-solid fa-satellite-dish text-cyan"></i> 전국 9개 지부 드론 GIS 통합 관제 모드
-          </div>
+      <div class="hud-top-bar">
+        <div class="hud-item">
+          <span class="hud-label">위도 (LAT)</span>
+          <span class="hud-val" id="hud-lat">36.300000° N</span>
         </div>
+        <div class="hud-item">
+          <span class="hud-label">경도 (LON)</span>
+          <span class="hud-val" id="hud-lon">127.500000° E</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">관측 고도 (ALT)</span>
+          <span class="hud-val" id="hud-alt">1,640m</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">방위각 (HDG)</span>
+          <span class="hud-val" id="hud-hdg">HDG 000°</span>
+        </div>
+      </div>
 
-        <div class="telemetry-wing">
-          <div class="tele-row"><span>위도:</span> <b id="hud-lat">36.350412° N</b></div>
-          <div class="tele-row"><span>경도:</span> <b id="hud-lon">127.384548° E</b></div>
-          <div class="tele-row"><span>고도:</span> <b id="hud-alt">850m</b></div>
-          <div class="tele-row"><span>방위:</span> <b id="hud-hdg">HDG 000°</b></div>
-        </div>
+      <!-- Center Crosshair Sight Overlay -->
+      <div class="center-sight">
+        <div class="sight-reticle"></div>
+        <div class="sight-corner top-left"></div>
+        <div class="sight-corner top-right"></div>
+        <div class="sight-corner bottom-left"></div>
+        <div class="sight-corner bottom-right"></div>
+        <div class="sight-data-tag" id="sight-coord-tag">36.300000° N, 127.500000° E</div>
+      </div>
+
+      <!-- Map Mode Floating Controls -->
+      <div class="map-floating-panel">
+        <button class="btn-floating" onclick="window.mapCtrl.flyToNationalOverview()" title="전국 개황 조망">
+          <i class="fa-solid fa-earth-asia"></i> <span>전국 조망 (합계)</span>
+        </button>
       </div>
     </section>
 
-    <!-- RIGHT SIDEBAR: National KPIs, Charts & Activity Feed -->
+    <!-- RIGHT SIDEBAR: National Rollup Analytics & Activity Feeds -->
     <aside class="sidebar right-sidebar">
-      
-      <!-- KPI Stats Grid -->
+
+      <!-- National KPI Rollup Grid -->
       <div class="sidebar-section">
         <div class="section-header">
           <div class="section-title">
@@ -157,19 +167,19 @@
         <div class="kpi-grid">
           <div class="kpi-box primary">
             <span class="kpi-label">전국 총 누적 작업면적</span>
-            <span class="kpi-val"><span id="kpi-total-area">377,000</span> <small>㎡</small></span>
+            <span class="kpi-val"><span id="kpi-total-area">98,000</span> <small>㎡</small></span>
           </div>
           <div class="kpi-box emerald">
             <span class="kpi-label">전국 총 교란종 수거량</span>
-            <span class="kpi-val"><span id="kpi-total-harvest">5,250</span> <small>kg</small></span>
+            <span class="kpi-val"><span id="kpi-total-harvest">1,290</span> <small>kg</small></span>
           </div>
           <div class="kpi-box amber">
             <span class="kpi-label">전국 총 운영 사업수</span>
-            <span class="kpi-val"><span id="kpi-active-projects">10</span> <small>개 사업</small></span>
+            <span class="kpi-val"><span id="kpi-active-projects">2</span> <small>개 사업</small></span>
           </div>
           <div class="kpi-box purple">
             <span class="kpi-label">전국 지부 가동 현황</span>
-            <span class="kpi-val" style="font-size: 0.85rem; color: #a855f7;"><span id="kpi-active-branches">9개 지부 전원 활성</span></span>
+            <span class="kpi-val" style="font-size: 0.82rem; color: #a855f7;"><span id="kpi-active-branches">대전충남세종 2개 사업 가동 (8개 지부 대기)</span></span>
           </div>
         </div>
       </div>
@@ -207,9 +217,9 @@
   </main>
 
   <!-- App Modules -->
-  <script src="map-controller.js?v=20260819_0740"></script>
-  <script src="branch-manager.js?v=20260819_0740"></script>
-  <script src="analytics.js?v=20260819_0740"></script>
-  <script src="app.js?v=20260819_0740"></script>
+  <script src="map-controller.js?v=20260819_0742"></script>
+  <script src="branch-manager.js?v=20260819_0742"></script>
+  <script src="analytics.js?v=20260819_0742"></script>
+  <script src="app.js?v=20260819_0742"></script>
 </body>
 </html>

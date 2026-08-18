@@ -1,6 +1,6 @@
 /**
  * National Map Controller Module (MapLibre GL JS High-Reliability Satellite Engine)
- * Visualizes Central HQ, 9 Branches & Projects with Zero-Drift Geometric Anchoring
+ * Visualizes 9 Branches & Projects with Zero-Drift Geometric Anchoring
  */
 
 class MapController {
@@ -81,9 +81,8 @@ class MapController {
     }
     this.markers = [];
 
-    // 1. Render Central HQ & 9 Branches (Geometric Center Zero-Drift)
+    // 1. Render 9 Official Branches (Geometric Center Zero-Drift)
     this.branches.forEach(branch => {
-      const isHq = branch.is_hq === true;
       const isActive = branch.status === 'active';
 
       const wrapper = document.createElement('div');
@@ -91,11 +90,11 @@ class MapController {
       wrapper.id = `marker-${branch.id}`;
 
       wrapper.innerHTML = `
-        <div class="hq-marker-icon" style="${isHq ? 'border-color: #fbbf24; color: #fbbf24; background: #1c1402; box-shadow: 0 0 14px rgba(251,191,36,0.8);' : (isActive ? 'border-color: #38bdf8; color: #38bdf8; background: #0c1524;' : 'border-color: #94a3b8; color: #94a3b8; background: #0c121d;')}">
-          <i class="fa-solid ${isHq ? 'fa-crown' : 'fa-building-flag'}"></i>
+        <div class="hq-marker-icon" style="${isActive ? 'border-color: #38bdf8; color: #38bdf8; background: #0c1524;' : 'border-color: #94a3b8; color: #94a3b8; background: #0c121d;'}">
+          <i class="fa-solid fa-building-flag"></i>
         </div>
-        <div class="hq-marker-label" style="${isHq ? 'border-color: #fbbf24; color: #fde047;' : (isActive ? 'border-color: #38bdf8; color: #38bdf8;' : 'border-color: rgba(255,255,255,0.2); color: #cbd5e1;')}">
-          ${isHq ? '🏛️ 중앙사무국' : branch.short_name}
+        <div class="hq-marker-label" style="${isActive ? 'border-color: #38bdf8; color: #38bdf8;' : 'border-color: rgba(255,255,255,0.2); color: #cbd5e1;'}">
+          ${branch.short_name}
         </div>
       `;
 
@@ -107,13 +106,13 @@ class MapController {
       const popup = new maplibregl.Popup({ offset: 18, closeButton: false })
         .setHTML(`
           <div style="padding: 8px; font-family: -apple-system, sans-serif; min-width: 220px;">
-            <div style="font-size: 0.9rem; font-weight: 800; color: ${isHq ? '#fbbf24' : '#38bdf8'}; margin-bottom: 4px;">
-              ${isHq ? '🏛️ 중앙사무국 (본부)' : '🏛️ ' + branch.name}
+            <div style="font-size: 0.9rem; font-weight: 800; color: #38bdf8; margin-bottom: 4px;">
+              🏛️ ${branch.name}
             </div>
             <div style="font-size: 0.75rem; color: #cbd5e1; line-height: 1.4; margin-bottom: 4px;">📍 ${branch.address}</div>
             <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px;">📞 ${branch.tel} / 👤 ${branch.manager}</div>
-            <div style="font-size: 0.72rem; font-weight: 700; color: ${isHq ? '#fbbf24' : (isActive ? '#34d399' : '#94a3b8')}; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 4px;">
-              ${isHq ? '👑 전국 9개 지부 총괄 기획 및 통합 관제 HQ' : (isActive ? `● 활성 사업: ${branch.active_projects_count}건 운영 중` : '○ 사업 연동 대기')}
+            <div style="font-size: 0.72rem; font-weight: 700; color: ${isActive ? '#34d399' : '#94a3b8'}; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 4px;">
+              ${isActive ? `● 활성 사업: ${branch.active_projects_count}건 운영 중` : '○ 사업 연동 대기'}
             </div>
           </div>
         `);
