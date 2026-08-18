@@ -183,7 +183,7 @@ class MapController {
         'text-field': [
           'case',
           ['==', ['get', 'is_hq'], 1],
-          '🏛️ 중앙사무국(본부)',
+          '🏛️ 중앙사무국',
           ['get', 'short_name']
         ],
         'text-size': ['interpolate', ['linear'], ['zoom'], 6, 10, 10, 12, 16, 14],
@@ -307,7 +307,7 @@ class MapController {
     const html = `
       <div style="padding: 8px; font-family: -apple-system, sans-serif; min-width: 220px;">
         <div style="font-size: 0.9rem; font-weight: 800; color: ${isHq ? '#fbbf24' : '#38bdf8'}; margin-bottom: 4px;">
-          ${isHq ? '🏛️ (사)야생생물관리협회 중앙사무국 (본부)' : '🏛️ ' + p.name}
+          ${isHq ? '🏛️ 중앙사무국 (본부)' : '🏛️ ' + p.name}
         </div>
         <div style="font-size: 0.75rem; color: #cbd5e1; line-height: 1.4; margin-bottom: 4px;">📍 ${p.address}</div>
         <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px;">📞 ${p.tel} / 👤 ${p.manager}</div>
