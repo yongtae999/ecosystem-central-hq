@@ -24,7 +24,7 @@ class AnalyticsManager {
     let totalArea = 0;
     let totalHarvest = 0;
     let totalProjects = projects.length;
-    let totalBranches = branches.length;
+    let activeBranchesCount = branches.filter(b => b.status === 'active').length;
 
     branches.forEach(b => {
       totalArea += (b.total_work_area_m2 || 0);
@@ -34,7 +34,7 @@ class AnalyticsManager {
     if (totalAreaEl) totalAreaEl.textContent = (totalArea).toLocaleString();
     if (totalHarvestEl) totalHarvestEl.textContent = (totalHarvest).toLocaleString();
     if (activeProjectsEl) activeProjectsEl.textContent = totalProjects;
-    if (activeBranchesEl) activeBranchesEl.textContent = `${totalBranches}개 지부 전원 활성`;
+    if (activeBranchesEl) activeBranchesEl.textContent = `대전충남세종 2개 사업 가동 (8개 지부 연동대기)`;
   }
 
   renderCharts(branches, projects) {
@@ -44,8 +44,8 @@ class AnalyticsManager {
       if (this.branchChart) this.branchChart.destroy();
 
       const labels = branches.map(b => b.short_name);
-      const areaData = branches.map(b => Math.round(b.total_work_area_m2 / 1000)); // in 1,000 m2
-      const harvestData = branches.map(b => b.total_harvest_kg);
+      const areaData = branches.map(b => Math.round((b.total_work_area_m2 || 0) / 1000)); // in 1,000 m2
+      const harvestData = branches.map(b => b.total_harvest_kg || 0);
 
       this.branchChart = new Chart(ctx1, {
         type: 'bar',
@@ -76,7 +76,7 @@ class AnalyticsManager {
             },
             title: {
               display: true,
-              text: '9개 지부별 실시간 누적 작업 실적 비교',
+              text: '9개 지부별 실시간 누적 작업 실적 현황',
               color: '#f8fafc',
               font: { size: 10, weight: 'bold' }
             }
@@ -97,10 +97,10 @@ class AnalyticsManager {
       this.speciesChart = new Chart(ctx2, {
         type: 'doughnut',
         data: {
-          labels: ['가시박', '단풍잎돼지풀', '환삼덩굴', '교란어종(배스/블루길)', '뉴트리아/기타'],
+          labels: ['가시박', '단풍잎돼지풀', '환삼덩굴', '기타 교란종'],
           datasets: [{
-            data: [58, 18, 12, 8, 4],
-            backgroundColor: ['#38bdf8', '#10b981', '#fbbf24', '#a855f7', '#f43f5e'],
+            data: [68, 16, 11, 5],
+            backgroundColor: ['#38bdf8', '#10b981', '#fbbf24', '#a855f7'],
             borderWidth: 0
           }]
         },
@@ -114,7 +114,7 @@ class AnalyticsManager {
             },
             title: {
               display: true,
-              text: '전국 교란생물종별 방제 구성비 (%)',
+              text: '실측 교란식물종별 방제 구성비 (%)',
               color: '#f8fafc',
               font: { size: 10, weight: 'bold' }
             }

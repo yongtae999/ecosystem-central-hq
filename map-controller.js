@@ -88,9 +88,11 @@ class MapController {
       el.className = 'hq-marker-pin';
       el.id = `branch-marker-${branch.id}`;
 
+      const isActive = branch.status === 'active';
+
       el.innerHTML = `
-        <div class="hq-pulse"></div>
-        <div class="hq-marker-icon" title="${branch.name}">
+        <div class="hq-pulse" style="${isActive ? 'background: rgba(56, 189, 248, 0.5);' : 'background: rgba(148, 163, 184, 0.3); animation-duration: 3s;'}"></div>
+        <div class="hq-marker-icon" style="${isActive ? '' : 'border-color: #94a3b8; color: #94a3b8;'}" title="${branch.name}">
           <i class="fa-solid fa-building-flag"></i>
         </div>
       `;
@@ -104,9 +106,11 @@ class MapController {
         .setHTML(`
           <div style="padding: 6px; font-family: sans-serif;">
             <b style="color: #38bdf8; font-size: 0.85rem;">🏛️ ${branch.name}</b><br>
-            <span style="font-size: 0.75rem; color: #cbd5e1;">${branch.desc}</span><br>
-            <span style="font-size: 0.72rem; color: #10b981; font-weight: bold;">활성 사업: ${branch.active_projects_count}개 구역</span><br>
-            <small style="color: #94a3b8;">누적 수거: ${(branch.total_harvest_kg).toLocaleString()} kg</small>
+            <span style="font-size: 0.72rem; color: #cbd5e1;">📍 ${branch.address}</span><br>
+            <span style="font-size: 0.7rem; color: #94a3b8;">📞 ${branch.tel} / 👤 ${branch.manager}</span><br>
+            <span style="font-size: 0.72rem; color: ${isActive ? '#10b981' : '#94a3b8'}; font-weight: bold;">
+              ${isActive ? `● 활성 사업: ${branch.active_projects_count}건 운영 중` : '○ 사업 연동 대기'}
+            </span>
           </div>
         `);
 
@@ -118,19 +122,19 @@ class MapController {
       this.markers.push(marker);
     });
 
-    // 2. Render Project Specific Pinpoints (e.g. Geumgang Cheonnae-ri, Paldang, etc.)
+    // 2. Render Project Specific Pinpoints (Geumgang Cheonnae-ri, Doowoong Wetland)
     this.projects.forEach(proj => {
       const el = document.createElement('div');
       el.className = 'hq-marker-pin';
-      el.style.width = '30px';
-      el.style.height = '30px';
+      el.style.width = '32px';
+      el.style.height = '32px';
 
       const isGeumgang = proj.id === 'proj-dcs-geumgang-01';
 
       el.innerHTML = `
-        <div class="hq-pulse" style="${isGeumgang ? 'background: rgba(16, 185, 129, 0.6);' : 'background: rgba(245, 158, 11, 0.4);'}"></div>
-        <div class="hq-marker-icon" style="${isGeumgang ? 'border-color: #10b981; color: #10b981; width: 24px; height: 24px; font-size: 0.75rem;' : 'border-color: #f59e0b; color: #f59e0b; width: 24px; height: 24px; font-size: 0.75rem;'}">
-          <i class="fa-solid ${isGeumgang ? 'fa-crosshairs' : 'fa-leaf'}"></i>
+        <div class="hq-pulse" style="${isGeumgang ? 'background: rgba(16, 185, 129, 0.6);' : 'background: rgba(56, 189, 248, 0.5);'}"></div>
+        <div class="hq-marker-icon" style="${isGeumgang ? 'border-color: #10b981; color: #10b981; width: 26px; height: 26px; font-size: 0.8rem;' : 'border-color: #38bdf8; color: #38bdf8; width: 26px; height: 26px; font-size: 0.8rem;'}">
+          <i class="fa-solid ${isGeumgang ? 'fa-crosshairs' : 'fa-seedling'}"></i>
         </div>
       `;
 
@@ -142,7 +146,7 @@ class MapController {
       const popup = new maplibregl.Popup({ offset: 20, closeButton: false })
         .setHTML(`
           <div style="padding: 6px; font-family: sans-serif;">
-            <b style="color: ${isGeumgang ? '#34d399' : '#fbbf24'}; font-size: 0.82rem;">🌿 ${proj.title}</b><br>
+            <b style="color: ${isGeumgang ? '#34d399' : '#38bdf8'}; font-size: 0.82rem;">🌿 ${proj.title}</b><br>
             <span style="font-size: 0.72rem; color: #94a3b8;">발주: ${proj.client}</span><br>
             <span style="font-size: 0.72rem; color: #cbd5e1;">위치: ${proj.location_name}</span><br>
             <span style="font-size: 0.72rem; color: #38bdf8; font-weight: bold;">실적: ${(proj.total_area_m2).toLocaleString()}㎡ (${proj.total_harvest_kg}kg 수거)</span><br>
@@ -179,7 +183,7 @@ class MapController {
 
     this.map.flyTo({
       center: [proj.lng, proj.lat],
-      zoom: proj.zoom || 15.0,
+      zoom: proj.zoom || 15.5,
       pitch: proj.pitch || 50,
       bearing: proj.bearing || 0,
       duration: 2200,
