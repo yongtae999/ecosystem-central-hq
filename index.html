@@ -21,22 +21,20 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Main Tactical Theme CSS -->
-  <link rel="stylesheet" href="styles.css?v=20260819_0750">
+  <link rel="stylesheet" href="styles.css?v=20260819_0755">
 </head>
 <body class="theme-tactical">
 
   <!-- 1. TOP GLOBAL NAVIGATION HEADER -->
   <header class="app-header">
-    <div class="header-left">
-      <div class="logo-wrapper">
-        <img src="assets/images/wma_logo.png" alt="WMA Logo" class="brand-logo" onerror="this.src='assets/icons/협회로고.png'">
-      </div>
-      <div class="brand-titles">
-        <div class="title-main">
-          <span class="org-badge">HQ CENTRAL</span>
+    <div class="brand-section">
+      <img src="assets/images/wma_logo.png" alt="WMA Logo" class="brand-logo" onerror="this.src='assets/icons/협회로고.png'">
+      <div class="brand-text-wrap">
+        <div class="brand-title">
+          <span class="hq-badge">HQ CENTRAL</span>
           생태계교란생물 제거사업 전국 통합 관제 플랫폼
         </div>
-        <div class="title-sub">
+        <div class="brand-subtitle">
           (사)야생생물관리협회 · 전국 9개 시·도 지부 드론 GIS 통합 모니터링 시스템
         </div>
       </div>
@@ -112,52 +110,42 @@
           <span class="section-badge" id="projects-count-badge">운영 중</span>
         </div>
 
-        <div class="project-list" id="branch-projects-container">
+        <div id="branch-projects-container">
           <!-- Populated by branch-manager.js -->
         </div>
       </div>
 
     </aside>
 
-    <!-- CENTER STAGE: 3D Map + HUD Overlay -->
-    <section class="map-container">
-      <div id="map-viewport"></div>
+    <!-- CENTER STAGE: National 3D Satellite Map & HUD -->
+    <section class="center-stage">
+      <div id="map-viewport" class="map-viewport"></div>
+
+      <!-- Real-time Tactical Center Sight -->
+      <div class="map-center-sight">
+        <div class="sight-ring"></div>
+        <div class="sight-line top"></div>
+        <div class="sight-line bottom"></div>
+        <div class="sight-line left"></div>
+        <div class="sight-line right"></div>
+        <div class="sight-dot"></div>
+        <div class="sight-tag" id="sight-coord-tag">36.300000° N, 127.500000° E</div>
+      </div>
 
       <!-- Tactical HUD Overlay -->
-      <div class="hud-top-bar">
-        <div class="hud-item">
-          <span class="hud-label">위도 (LAT)</span>
-          <span class="hud-val" id="hud-lat">36.300000° N</span>
+      <div class="map-hud-overlay">
+        <div class="top-hud-bar">
+          <div class="hud-pill">
+            <i class="fa-solid fa-satellite-dish text-cyan"></i> 전국 9개 지부 드론 GIS 통합 관제 모드
+          </div>
         </div>
-        <div class="hud-item">
-          <span class="hud-label">경도 (LON)</span>
-          <span class="hud-val" id="hud-lon">127.500000° E</span>
-        </div>
-        <div class="hud-item">
-          <span class="hud-label">관측 고도 (ALT)</span>
-          <span class="hud-val" id="hud-alt">1,640m</span>
-        </div>
-        <div class="hud-item">
-          <span class="hud-label">방위각 (HDG)</span>
-          <span class="hud-val" id="hud-hdg">HDG 000°</span>
-        </div>
-      </div>
 
-      <!-- Center Crosshair Sight Overlay -->
-      <div class="center-sight">
-        <div class="sight-reticle"></div>
-        <div class="sight-corner top-left"></div>
-        <div class="sight-corner top-right"></div>
-        <div class="sight-corner bottom-left"></div>
-        <div class="sight-corner bottom-right"></div>
-        <div class="sight-data-tag" id="sight-coord-tag">36.300000° N, 127.500000° E</div>
-      </div>
-
-      <!-- Map Mode Floating Controls -->
-      <div class="map-floating-panel">
-        <button class="btn-floating" onclick="window.mapCtrl.flyToNationalOverview()" title="전국 개황 조망">
-          <i class="fa-solid fa-earth-asia"></i> <span>전국 조망 (합계)</span>
-        </button>
+        <div class="telemetry-wing">
+          <div class="tele-row"><span>위도:</span> <b id="hud-lat">36.300000° N</b></div>
+          <div class="tele-row"><span>경도:</span> <b id="hud-lon">127.500000° E</b></div>
+          <div class="tele-row"><span>고도:</span> <b id="hud-alt">1,640m</b></div>
+          <div class="tele-row"><span>방위:</span> <b id="hud-hdg">HDG 000°</b></div>
+        </div>
       </div>
     </section>
 
@@ -384,11 +372,11 @@
   </div>
 
   <!-- App Modules -->
-  <script src="data-store.js?v=20260819_0750"></script>
-  <script src="map-controller.js?v=20260819_0750"></script>
-  <script src="branch-manager.js?v=20260819_0750"></script>
-  <script src="analytics.js?v=20260819_0750"></script>
-  <script src="admin-modal.js?v=20260819_0750"></script>
-  <script src="app.js?v=20260819_0750"></script>
+  <script src="data-store.js?v=20260819_0755"></script>
+  <script src="map-controller.js?v=20260819_0755"></script>
+  <script src="branch-manager.js?v=20260819_0755"></script>
+  <script src="analytics.js?v=20260819_0755"></script>
+  <script src="admin-modal.js?v=20260819_0755"></script>
+  <script src="app.js?v=20260819_0755"></script>
 </body>
 </html>
