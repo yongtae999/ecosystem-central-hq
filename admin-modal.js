@@ -188,6 +188,13 @@ class AdminModalManager {
       species.push(cb.value);
     });
 
+    // Custom species input
+    const customSpeciesInput = document.getElementById('proj-custom-species-input');
+    if (customSpeciesInput && customSpeciesInput.value.trim()) {
+      const customs = customSpeciesInput.value.split(',').map(s => s.trim()).filter(s => s);
+      species.push(...customs);
+    }
+
     if (!title) {
       alert('사업명을 입력해 주세요.');
       return;

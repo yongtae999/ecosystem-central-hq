@@ -833,14 +833,30 @@ body {
   box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
 }
 
-.species-checkbox-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  background: rgba(6, 9, 14, 0.5);
-  padding: 10px;
+.species-category-group {
+  background: rgba(6, 9, 14, 0.6);
+  padding: 10px 12px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.species-cat-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.species-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 4px;
 }
 
 .species-checkbox-grid label {
@@ -851,6 +867,14 @@ body {
   align-items: center;
   gap: 4px;
   cursor: pointer;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 3px 6px;
+  border-radius: 3px;
+}
+
+.species-checkbox-grid label:hover {
+  background: rgba(56, 189, 248, 0.1);
+  color: #fff;
 }
 
 .modal-actions {

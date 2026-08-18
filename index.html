@@ -278,16 +278,39 @@
         </div>
 
         <div class="form-group">
-          <label>주요 대상 생태계교란생물</label>
-          <div class="species-checkbox-grid">
-            <label><input type="checkbox" name="proj-species" value="가시박" checked> 가시박</label>
-            <label><input type="checkbox" name="proj-species" value="단풍잎돼지풀" checked> 단풍잎돼지풀</label>
-            <label><input type="checkbox" name="proj-species" value="환삼덩굴" checked> 환삼덩굴</label>
-            <label><input type="checkbox" name="proj-species" value="돼지풀"> 돼지풀</label>
-            <label><input type="checkbox" name="proj-species" value="서양등골나물"> 서양등골나물</label>
-            <label><input type="checkbox" name="proj-species" value="붉은귀거북"> 붉은귀거북</label>
-            <label><input type="checkbox" name="proj-species" value="황소개구리"> 황소개구리</label>
-            <label><input type="checkbox" name="proj-species" value="뉴트리아"> 뉴트리아</label>
+          <label>주요 대상 생태계교란생물 선택 (다중 선택 가능)</label>
+          <div class="species-category-group">
+            <div class="species-cat-title">🌿 교란식물</div>
+            <div class="species-checkbox-grid">
+              <label><input type="checkbox" name="proj-species" value="가시박" checked> 가시박</label>
+              <label><input type="checkbox" name="proj-species" value="단풍잎돼지풀" checked> 단풍잎돼지풀</label>
+              <label><input type="checkbox" name="proj-species" value="환삼덩굴" checked> 환삼덩굴</label>
+              <label><input type="checkbox" name="proj-species" value="서양금혼초"> 서양금혼초</label>
+              <label><input type="checkbox" name="proj-species" value="가시상추"> 가시상추</label>
+              <label><input type="checkbox" name="proj-species" value="돼지풀"> 돼지풀</label>
+              <label><input type="checkbox" name="proj-species" value="서양등골나물"> 서양등골나물</label>
+              <label><input type="checkbox" name="proj-species" value="미국쑥부쟁이"> 미국쑥부쟁이</label>
+              <label><input type="checkbox" name="proj-species" value="양미역취"> 양미역취</label>
+              <label><input type="checkbox" name="proj-species" value="가시대나무"> 가시대나무</label>
+            </div>
+
+            <div class="species-cat-title" style="margin-top: 8px;">🐟 교란어류</div>
+            <div class="species-checkbox-grid">
+              <label><input type="checkbox" name="proj-species" value="배스"> 배스 (큰입배스)</label>
+              <label><input type="checkbox" name="proj-species" value="블루길"> 블루길 (파랑볼우럭)</label>
+              <label><input type="checkbox" name="proj-species" value="강준치"> 강준치</label>
+            </div>
+
+            <div class="species-cat-title" style="margin-top: 8px;">🐢 양서·파충류 / 포유류</div>
+            <div class="species-checkbox-grid">
+              <label><input type="checkbox" name="proj-species" value="붉은귀거북"> 붉은귀거북</label>
+              <label><input type="checkbox" name="proj-species" value="황소개구리"> 황소개구리</label>
+              <label><input type="checkbox" name="proj-species" value="뉴트리아"> 뉴트리아</label>
+              <label><input type="checkbox" name="proj-species" value="미국가재"> 미국가재</label>
+            </div>
+          </div>
+          <div style="margin-top: 6px;">
+            <input type="text" id="proj-custom-species-input" class="form-input" placeholder="기타 추가 생물종 직접 입력 (예: 늑대거북, 브라운송어 - 쉼표로 구분)">
           </div>
         </div>
 
@@ -372,11 +395,11 @@
   </div>
 
   <!-- App Modules -->
-  <script src="data-store.js?v=20260819_0755"></script>
-  <script src="map-controller.js?v=20260819_0755"></script>
-  <script src="branch-manager.js?v=20260819_0755"></script>
-  <script src="analytics.js?v=20260819_0755"></script>
-  <script src="admin-modal.js?v=20260819_0755"></script>
-  <script src="app.js?v=20260819_0755"></script>
+  <script src="data-store.js?v=20260819_0827"></script>
+  <script src="map-controller.js?v=20260819_0827"></script>
+  <script src="branch-manager.js?v=20260819_0827"></script>
+  <script src="analytics.js?v=20260819_0827"></script>
+  <script src="admin-modal.js?v=20260819_0827"></script>
+  <script src="app.js?v=20260819_0827"></script>
 </body>
 </html>
