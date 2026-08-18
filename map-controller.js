@@ -54,7 +54,7 @@ class MapController {
       },
       center: koreaCenter,
       zoom: 7.2,
-      pitch: 35,
+      pitch: 0,
       bearing: 0,
       maxPitch: 85,
       antialias: true
@@ -82,7 +82,7 @@ class MapController {
     }
     this.markers = [];
 
-    // 1. Render 9 Branch Center Markers
+    // 1. Render 9 Branch Center Markers (Zero-drift Pinned)
     this.branches.forEach(branch => {
       const el = document.createElement('div');
       el.className = 'hq-marker-pin';
@@ -91,9 +91,11 @@ class MapController {
       const isActive = branch.status === 'active';
 
       el.innerHTML = `
-        <div class="hq-pulse" style="${isActive ? 'background: rgba(56, 189, 248, 0.5);' : 'background: rgba(148, 163, 184, 0.3); animation-duration: 3s;'}"></div>
-        <div class="hq-marker-icon" style="${isActive ? '' : 'border-color: #94a3b8; color: #94a3b8;'}" title="${branch.name}">
+        <div class="hq-marker-icon" style="${isActive ? 'border-color: #38bdf8; color: #38bdf8;' : 'border-color: #94a3b8; color: #94a3b8;'}" title="${branch.name}">
           <i class="fa-solid fa-building-flag"></i>
+        </div>
+        <div class="hq-marker-label" style="${isActive ? 'border-color: #38bdf8; color: #38bdf8;' : 'border-color: rgba(255,255,255,0.2); color: #cbd5e1;'}">
+          ${branch.short_name}
         </div>
       `;
 
@@ -102,7 +104,7 @@ class MapController {
         if (this.onSelectBranch) this.onSelectBranch(branch.id);
       });
 
-      const popup = new maplibregl.Popup({ offset: 25, closeButton: false })
+      const popup = new maplibregl.Popup({ offset: 15, closeButton: false })
         .setHTML(`
           <div style="padding: 6px; font-family: sans-serif;">
             <b style="color: #38bdf8; font-size: 0.85rem;">🏛️ ${branch.name}</b><br>
@@ -114,7 +116,12 @@ class MapController {
           </div>
         `);
 
-      const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
+      const marker = new maplibregl.Marker({
+        element: el,
+        anchor: 'center',
+        pitchAlignment: 'viewport',
+        rotationAlignment: 'viewport'
+      })
         .setLngLat([branch.lng, branch.lat])
         .setPopup(popup)
         .addTo(this.map);
@@ -126,15 +133,15 @@ class MapController {
     this.projects.forEach(proj => {
       const el = document.createElement('div');
       el.className = 'hq-marker-pin';
-      el.style.width = '32px';
-      el.style.height = '32px';
 
       const isGeumgang = proj.id === 'proj-dcs-geumgang-01';
 
       el.innerHTML = `
-        <div class="hq-pulse" style="${isGeumgang ? 'background: rgba(16, 185, 129, 0.6);' : 'background: rgba(56, 189, 248, 0.5);'}"></div>
-        <div class="hq-marker-icon" style="${isGeumgang ? 'border-color: #10b981; color: #10b981; width: 26px; height: 26px; font-size: 0.8rem;' : 'border-color: #38bdf8; color: #38bdf8; width: 26px; height: 26px; font-size: 0.8rem;'}">
+        <div class="hq-marker-icon" style="${isGeumgang ? 'border-color: #10b981; color: #10b981;' : 'border-color: #fbbf24; color: #fbbf24;'}">
           <i class="fa-solid ${isGeumgang ? 'fa-crosshairs' : 'fa-seedling'}"></i>
+        </div>
+        <div class="hq-marker-label" style="${isGeumgang ? 'border-color: #10b981; color: #34d399;' : 'border-color: #fbbf24; color: #fbbf24;'}">
+          ${isGeumgang ? '천내리습지' : '두웅습지'}
         </div>
       `;
 
@@ -143,10 +150,10 @@ class MapController {
         if (this.onSelectProject) this.onSelectProject(proj.id);
       });
 
-      const popup = new maplibregl.Popup({ offset: 20, closeButton: false })
+      const popup = new maplibregl.Popup({ offset: 15, closeButton: false })
         .setHTML(`
           <div style="padding: 6px; font-family: sans-serif;">
-            <b style="color: ${isGeumgang ? '#34d399' : '#38bdf8'}; font-size: 0.82rem;">🌿 ${proj.title}</b><br>
+            <b style="color: ${isGeumgang ? '#34d399' : '#fbbf24'}; font-size: 0.82rem;">🌿 ${proj.title}</b><br>
             <span style="font-size: 0.72rem; color: #94a3b8;">발주: ${proj.client}</span><br>
             <span style="font-size: 0.72rem; color: #cbd5e1;">위치: ${proj.location_name}</span><br>
             <span style="font-size: 0.72rem; color: #38bdf8; font-weight: bold;">실적: ${(proj.total_area_m2).toLocaleString()}㎡ (${proj.total_harvest_kg}kg 수거)</span><br>
@@ -154,7 +161,12 @@ class MapController {
           </div>
         `);
 
-      const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
+      const marker = new maplibregl.Marker({
+        element: el,
+        anchor: 'center',
+        pitchAlignment: 'viewport',
+        rotationAlignment: 'viewport'
+      })
         .setLngLat([proj.lng, proj.lat])
         .setPopup(popup)
         .addTo(this.map);
@@ -169,8 +181,8 @@ class MapController {
 
     this.map.flyTo({
       center: [branch.lng, branch.lat],
-      zoom: branch.zoom || 9.0,
-      pitch: 45,
+      zoom: branch.zoom || 15.5,
+      pitch: 0,
       bearing: 0,
       duration: 2000,
       essential: true
@@ -184,8 +196,8 @@ class MapController {
     this.map.flyTo({
       center: [proj.lng, proj.lat],
       zoom: proj.zoom || 15.5,
-      pitch: proj.pitch || 50,
-      bearing: proj.bearing || 0,
+      pitch: 0,
+      bearing: 0,
       duration: 2200,
       essential: true
     });
@@ -195,7 +207,7 @@ class MapController {
     this.map.flyTo({
       center: [127.7669, 36.3504],
       zoom: 7.2,
-      pitch: 35,
+      pitch: 0,
       bearing: 0,
       duration: 2200,
       essential: true
