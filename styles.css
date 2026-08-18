@@ -545,10 +545,10 @@ body {
   white-space: nowrap;
 }
 
-/* Map Markers (Zero-Drift Fixed Needle Pin - Anchor: Bottom) */
+/* Map Markers (High-Contrast Zero-Drift Needle Pin) */
 .hq-needle-marker {
-  width: 96px;
-  height: 48px;
+  width: 100px;
+  height: 52px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -557,102 +557,96 @@ body {
   cursor: pointer;
   pointer-events: auto;
   user-select: none;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.9));
 }
 
 .needle-label {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  padding: 1px 6px;
-  border-radius: 3px;
+  padding: 2px 7px;
+  border-radius: 4px;
   white-space: nowrap;
   text-align: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
   margin-bottom: 2px;
 }
 
+/* 1. HQ: Gold Amber */
 .needle-label.hq {
-  background: #1c1402;
-  border: 1px solid #fbbf24;
-  color: #fde047;
+  background: #271702;
+  border: 1.5px solid #fbbf24;
+  color: #fef08a;
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
 }
 
-.needle-label.active {
+/* 2. 9 Branches: Vivid Electric Blue */
+.needle-label.branch, .needle-label.active, .needle-label.standby {
   background: #082f49;
-  border: 1px solid #38bdf8;
-  color: #38bdf8;
+  border: 1.5px solid #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
 }
 
-.needle-label.standby {
-  background: #0f172a;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #cbd5e1;
-}
-
+/* 3. Project Sites: Vivid Emerald Green */
 .needle-label.project {
-  background: #061e12;
-  border: 1px solid #10b981;
-  color: #34d399;
+  background: #022c22;
+  border: 1.5px solid #34d399;
+  color: #a7f3d0;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
 }
 
 .needle-circle {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  font-size: 0.78rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
   z-index: 2;
 }
 
 .needle-circle.hq {
   background: #fbbf24;
-  color: #000;
+  color: #1a1002;
   border: 2px solid #ffffff;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.9);
 }
 
-.needle-circle.active {
+.needle-circle.branch, .needle-circle.active, .needle-circle.standby {
   background: #0284c7;
   color: #ffffff;
   border: 2px solid #ffffff;
-}
-
-.needle-circle.standby {
-  background: #475569;
-  color: #ffffff;
-  border: 2px solid #ffffff;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
 }
 
 .needle-circle.project {
   background: #10b981;
   color: #ffffff;
   border: 2px solid #ffffff;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.9);
 }
 
 .needle-point {
   width: 0;
   height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
   margin-top: -1px;
   z-index: 1;
 }
 
 .needle-point.hq {
-  border-top: 6px solid #fbbf24;
+  border-top: 7px solid #fbbf24;
 }
 
-.needle-point.active {
-  border-top: 6px solid #0284c7;
-}
-
-.needle-point.standby {
-  border-top: 6px solid #475569;
+.needle-point.branch, .needle-point.active, .needle-point.standby {
+  border-top: 7px solid #0284c7;
 }
 
 .needle-point.project {
-  border-top: 6px solid #10b981;
+  border-top: 7px solid #10b981;
 }
 
 /* ===================================================================
