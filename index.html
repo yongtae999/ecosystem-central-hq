@@ -3,45 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>생태계교란생물 제거사업 전국 통합 관제 플랫폼 | (사)야생생물관리협회 중앙사무국</title>
-  
-  <!-- Open Graph Meta for Social Sharing -->
-  <meta property="og:title" content="(사)야생생물관리협회 전국 생태계교란생물 제거사업 통합 관제 플랫폼">
-  <meta property="og:description" content="중앙사무국 및 전국 9개 지부 실시간 드론 정사영상 모니터링 및 실적 통합 관제 시스템">
-  <meta property="og:image" content="assets/images/og_share_logo.png">
+  <title>(사)야생생물관리협회 전국 생태계교란생물 제거사업 중앙사무국 총괄 관제 플랫폼</title>
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="assets/images/app_logo.png">
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
-  <!-- Web Fonts -->
-  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <!-- FontAwesome 6.4 Free CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-  <!-- MapLibre GL JS CSS & JS -->
+  <!-- MapLibre GL JS (Map Engine) -->
   <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
   <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Chart.js 4.4 CDN for HQ Real-time Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=20260819_01">
+  <!-- Main Tactical Theme CSS -->
+  <link rel="stylesheet" href="styles.css?v=20260819_0750">
 </head>
-<body>
+<body class="theme-tactical">
 
-  <!-- 1. GLOBAL HEADER -->
-  <header class="global-header">
-    <div class="brand-section">
-      <img src="assets/images/app_logo.png" alt="(사)야생생물관리협회 로고" class="brand-logo">
-      <div class="brand-text-wrap">
-        <div class="brand-title">
-          <span>생태계교란생물 제거사업 전국 통합 관제 플랫폼</span>
-          <span class="hq-badge">중앙사무국 HQ</span>
+  <!-- 1. TOP GLOBAL NAVIGATION HEADER -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo-wrapper">
+        <img src="assets/images/wma_logo.png" alt="WMA Logo" class="brand-logo" onerror="this.src='assets/icons/협회로고.png'">
+      </div>
+      <div class="brand-titles">
+        <div class="title-main">
+          <span class="org-badge">HQ CENTRAL</span>
+          생태계교란생물 제거사업 전국 통합 관제 플랫폼
         </div>
-        <div class="brand-subtitle">
+        <div class="title-sub">
           (사)야생생물관리협회 · 전국 9개 시·도 지부 드론 GIS 통합 모니터링 시스템
         </div>
       </div>
@@ -64,6 +59,19 @@
           <option value="jeju">📍 제주 지부 (제주)</option>
         </select>
       </div>
+
+      <!-- Quick Action Buttons -->
+      <button id="btn-open-new-project-modal" class="btn-tactical accent" title="신규 지부 제거사업 개설">
+        <i class="fa-solid fa-plus-circle"></i> <span>신규 사업 등록</span>
+      </button>
+
+      <button id="btn-open-activity-modal" class="btn-tactical emerald" title="현장 작업 결과 및 일지 등록">
+        <i class="fa-solid fa-file-pen"></i> <span>작업일지 등록</span>
+      </button>
+
+      <button id="btn-export-json" class="btn-tactical secondary" title="전체 데이터 JSON 백업 다운로드">
+        <i class="fa-solid fa-download"></i> <span>데이터 백업</span>
+      </button>
 
       <a href="https://yongtae999.github.io/geumgang-drone-monitor/" target="_blank" class="btn-tactical primary" title="금강유역 천내리습지 3D 드론 정사영상 실시간 관제 시스템 열기">
         <i class="fa-solid fa-plane-up"></i> <span>금강 드론 관제</span>
@@ -108,6 +116,7 @@
           <!-- Populated by branch-manager.js -->
         </div>
       </div>
+
     </aside>
 
     <!-- CENTER STAGE: 3D Map + HUD Overlay -->
@@ -216,10 +225,170 @@
     </aside>
   </main>
 
+  <!-- ===================================================================
+       MODAL 1: NEW PROJECT WIZARD
+       =================================================================== -->
+  <div class="modal-overlay" id="modal-new-project">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-seedling text-cyan"></i> 신규 생태계교란생물 제거사업 등록
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <form id="form-new-project" class="modal-form">
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label>담당 지부 선택 *</label>
+            <select id="proj-branch-select" class="form-input" required>
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <div class="form-group flex-1">
+            <label>발주처 (유역청/지자체) *</label>
+            <input type="text" id="proj-client-input" class="form-input" placeholder="예: 환경부 원주지방환경청" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>공식 사업명 *</label>
+          <input type="text" id="proj-title-input" class="form-input" placeholder="예: 2026년 소양호 생태계교란생물 제거사업" required>
+        </div>
+
+        <div class="form-group">
+          <label>사업 대상지 명칭 및 주소 *</label>
+          <input type="text" id="proj-loc-name-input" class="form-input" placeholder="예: 강원도 춘천시 소양호 상류 일원" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label>위도 (Latitude)</label>
+            <input type="number" step="0.000001" id="proj-lat-input" class="form-input" placeholder="예: 37.881234">
+          </div>
+          <div class="form-group flex-1">
+            <label>경도 (Longitude)</label>
+            <input type="number" step="0.000001" id="proj-lng-input" class="form-input" placeholder="예: 127.734567">
+          </div>
+          <div class="form-group" style="align-self: flex-end;">
+            <button type="button" id="btn-pick-map-loc" class="btn-tactical secondary" style="height: 38px;">
+              <i class="fa-solid fa-crosshairs"></i> 지도에서 찍기
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label>사업 수행 기간</label>
+            <input type="text" id="proj-period-input" class="form-input" placeholder="예: 2026.05 ~ 2026.11" value="2026.05 ~ 2026.11">
+          </div>
+          <div class="form-group flex-1">
+            <label>드론 전용 관제 웹페이지 URL (선택)</label>
+            <input type="url" id="proj-drone-url-input" class="form-input" placeholder="https://...">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>주요 대상 생태계교란생물</label>
+          <div class="species-checkbox-grid">
+            <label><input type="checkbox" name="proj-species" value="가시박" checked> 가시박</label>
+            <label><input type="checkbox" name="proj-species" value="단풍잎돼지풀" checked> 단풍잎돼지풀</label>
+            <label><input type="checkbox" name="proj-species" value="환삼덩굴" checked> 환삼덩굴</label>
+            <label><input type="checkbox" name="proj-species" value="돼지풀"> 돼지풀</label>
+            <label><input type="checkbox" name="proj-species" value="서양등골나물"> 서양등골나물</label>
+            <label><input type="checkbox" name="proj-species" value="붉은귀거북"> 붉은귀거북</label>
+            <label><input type="checkbox" name="proj-species" value="황소개구리"> 황소개구리</label>
+            <label><input type="checkbox" name="proj-species" value="뉴트리아"> 뉴트리아</label>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-tactical secondary modal-close-btn">취소</button>
+          <button type="submit" class="btn-tactical primary">
+            <i class="fa-solid fa-check"></i> 신규 사업 개설 완료
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 2: DAILY ACTIVITY LOG
+       =================================================================== -->
+  <div class="modal-overlay" id="modal-new-activity">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-file-pen text-emerald"></i> 현장 작업일지 및 실적 간편 등록
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <form id="form-new-activity" class="modal-form">
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label>소속 지부 *</label>
+            <select id="act-branch-select" class="form-input" required>
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <div class="form-group flex-1">
+            <label>대상 사업 선택 *</label>
+            <select id="act-project-select" class="form-input" required>
+              <!-- Populated dynamically based on branch -->
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label>작업 일자 *</label>
+            <input type="date" id="act-date-input" class="form-input" required>
+          </div>
+          <div class="form-group flex-1">
+            <label>작업 구분 *</label>
+            <input type="text" id="act-type-input" class="form-input" placeholder="예: 2차 물리적 굴취 및 예초" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label>투입 인원 (명) *</label>
+            <input type="number" id="act-worker-input" class="form-input" min="1" placeholder="예: 8" required>
+          </div>
+          <div class="form-group flex-1">
+            <label>당일 작업 면적 (㎡) *</label>
+            <input type="number" id="act-area-input" class="form-input" min="0" placeholder="예: 15000" required>
+          </div>
+          <div class="form-group flex-1">
+            <label>당일 수거량 (kg) *</label>
+            <input type="number" id="act-harvest-input" class="form-input" min="0" placeholder="예: 320" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>현장 작업 요약 및 특이사항</label>
+          <textarea id="act-summary-input" class="form-input" rows="3" placeholder="예: 수변 수목을 타고 올라가는 가시박 줄기 절단 및 지상부 전량 수거·퇴비화 처리 완료"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-tactical secondary modal-close-btn">취소</button>
+          <button type="submit" class="btn-tactical emerald">
+            <i class="fa-solid fa-cloud-arrow-up"></i> 실적 등록 및 자동 집계
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- App Modules -->
-  <script src="map-controller.js?v=20260819_0742"></script>
-  <script src="branch-manager.js?v=20260819_0742"></script>
-  <script src="analytics.js?v=20260819_0742"></script>
-  <script src="app.js?v=20260819_0742"></script>
+  <script src="data-store.js?v=20260819_0750"></script>
+  <script src="map-controller.js?v=20260819_0750"></script>
+  <script src="branch-manager.js?v=20260819_0750"></script>
+  <script src="analytics.js?v=20260819_0750"></script>
+  <script src="admin-modal.js?v=20260819_0750"></script>
+  <script src="app.js?v=20260819_0750"></script>
 </body>
 </html>
