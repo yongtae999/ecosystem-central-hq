@@ -71,6 +71,13 @@ class BranchManager {
           <span>작업면적: <b>${isActive ? (branch.total_work_area_m2).toLocaleString() + ' ㎡' : '-'}</b></span>
           <span>수거량: <b style="color: ${isActive ? '#34d399' : '#94a3b8'};">${isActive ? (branch.total_harvest_kg).toLocaleString() + ' kg' : '-'}</b></span>
         </div>
+        ${branch.dashboard_url ? `
+          <div style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(255,255,255,0.08);">
+            <a href="${branch.dashboard_url}" target="_blank" class="btn-tactical secondary" style="width: 100%; justify-content: center; font-size: 0.72rem; padding: 4px 8px;" onclick="event.stopPropagation();">
+              <i class="fa-solid fa-plane-up"></i> ${branch.short_name} 전용 관제 열기
+            </a>
+          </div>
+        ` : ''}
       `;
 
       card.addEventListener('click', () => {

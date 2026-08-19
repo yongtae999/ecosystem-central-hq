@@ -17,6 +17,7 @@
     "active_projects_count": 0,
     "total_work_area_m2": 0,
     "total_harvest_kg": 0,
+    "dashboard_url": "index.html",
     "desc": "전국 9개 지부 생태계교란생물 제거사업 총괄 기획 및 전산 실적 통합 관제 HQ"
   },
   {
@@ -36,6 +37,7 @@
     "active_projects_count": 2,
     "total_work_area_m2": 98000,
     "total_harvest_kg": 1290,
+    "dashboard_url": "https://yongtae999.github.io/geumgang-drone-monitor/",
     "desc": "금강 천내리습지 1~3구간 및 태안 두웅습지보호지역 생태계교란생물 집중 관제"
   },
   {
@@ -55,6 +57,7 @@
     "active_projects_count": 0,
     "total_work_area_m2": 0,
     "total_harvest_kg": 0,
+    "dashboard_url": "branches/seoul-gyeonggi/index.html",
     "desc": "한강 수계 및 수도권 생태계교란생물 제거사업 연동 대기"
   },
   {
@@ -74,6 +77,7 @@
     "active_projects_count": 0,
     "total_work_area_m2": 0,
     "total_harvest_kg": 0,
+    "dashboard_url": "branches/gangwon/index.html",
     "desc": "소양호·북한강 및 강원 산림/하천 교란종 사업 연동 대기"
   },
   {
@@ -93,6 +97,7 @@
     "active_projects_count": 0,
     "total_work_area_m2": 0,
     "total_harvest_kg": 0,
+    "dashboard_url": "branches/chungbuk/index.html",
     "desc": "남한강 충주호 상류 및 미호강 수계 사업 연동 대기"
   },
   {
@@ -112,6 +117,7 @@
     "active_projects_count": 0,
     "total_work_area_m2": 0,
     "total_harvest_kg": 0,
+    "dashboard_url": "branches/daegu-gyeongbuk/index.html",
     "desc": "낙동강 중상류 수변구역 교란생물 방제사업 연동 대기"
   },
   {
@@ -131,6 +137,7 @@
     "active_projects_count": 0,
     "total_work_area_m2": 0,
     "total_harvest_kg": 0,
+    "dashboard_url": "branches/busan-ulsan-gyeongnam/index.html",
     "desc": "낙동강 하구 및 을숙도 습지보호지역 사업 연동 대기"
   },
   {
@@ -150,6 +157,7 @@
     "active_projects_count": 0,
     "total_work_area_m2": 0,
     "total_harvest_kg": 0,
+    "dashboard_url": "branches/jeonbuk/index.html",
     "desc": "만경강·동진강 수계 및 새만금 일원 사업 연동 대기"
   },
   {
@@ -169,6 +177,7 @@
     "active_projects_count": 0,
     "total_work_area_m2": 0,
     "total_harvest_kg": 0,
+    "dashboard_url": "branches/gwangju-jeonnam/index.html",
     "desc": "영산강·섬진강 수계 생태계교란생물 퇴치사업 연동 대기"
   },
   {
@@ -188,6 +197,7 @@
     "active_projects_count": 0,
     "total_work_area_m2": 0,
     "total_harvest_kg": 0,
+    "dashboard_url": "branches/jeju/index.html",
     "desc": "제주 곶자왈 및 주요 오름 생태계 보전사업 연동 대기"
   }
 ]

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>(사)야생생물관리협회 서울·인천·경기 지부 생태계교란생물 관제 시스템</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+
+  <link rel="stylesheet" href="../branch-style.css?v=20260819_0915">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header class="app-header">
+    <div class="brand-section">
+      <img src="../../assets/images/wma_logo.png" alt="WMA Logo" class="brand-logo" onerror="this.src='../../assets/icons/협회로고.png'">
+      <div>
+        <div class="brand-title">
+          <span class="branch-badge" id="branch-badge-code">BRANCH</span>
+          <span id="branch-title-name">서울·인천·경기 지부 관제 플랫폼</span>
+        </div>
+        <div class="brand-subtitle">
+          (사)야생생물관리협회 · 생태계교란생물 제거사업 지부 전용 모니터링 시스템
+        </div>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <a href="../../index.html" class="btn-tactical primary">
+        <i class="fa-solid fa-building-flag"></i> <span>중앙사무국 총괄 HQ</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-layout">
+    <!-- Left Sidebar: Branch Info -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="section-title">
+          <i class="fa-solid fa-id-card"></i> 지부 조직 및 연락망
+        </div>
+        <table class="info-table" id="branch-info-table">
+          <!-- Populated by JS -->
+        </table>
+      </div>
+
+      <div class="sidebar-section" style="flex: 1;">
+        <div class="section-title">
+          <i class="fa-solid fa-folder-tree"></i> 지부 주관 사업 목록
+        </div>
+        <div id="branch-projects-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- Center 3D Map -->
+    <section class="center-stage">
+      <div id="map-viewport" class="map-viewport"></div>
+      <div class="map-hud">
+        <i class="fa-solid fa-satellite"></i> <span>지부 관할구역 3D 위성 실시간 관제 모드</span>
+      </div>
+    </section>
+
+    <!-- Right Sidebar: Local Stats -->
+    <aside class="sidebar right-sidebar">
+      <div class="sidebar-section">
+        <div class="section-title">
+          <i class="fa-solid fa-chart-simple"></i> 당해 지부 실적 집계
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <span class="kpi-label">운영 사업수</span>
+            <span class="kpi-val" id="stat-active-projects">0건</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">누적 면적</span>
+            <span class="kpi-val" id="stat-total-area">0 ㎡</span>
+          </div>
+        </div>
+        <div class="kpi-card" style="margin-top: 8px;">
+          <span class="kpi-label">총 수거량</span>
+          <span class="kpi-val" id="stat-total-harvest" style="color: var(--accent-emerald);">0 kg</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-title">
+          <i class="fa-solid fa-link"></i> 중앙 전산 연동 상태
+        </div>
+        <div style="font-size: 0.75rem; color: #cbd5e1; line-height: 1.5;">
+          ● 중앙사무국 총괄 관제 파이프라인 정상 가동 중<br>
+          ● 신규 사업 및 일지 등록 시 즉시 실시간 반영
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script src="../branch-page.js?v=20260819_0915"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const app = new BranchMonitorApp('seoul-gyeonggi');
+      app.init();
+    });
+  </script>
+</body>
+</html>

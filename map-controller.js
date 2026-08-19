@@ -150,9 +150,10 @@ class MapController {
             </div>
             <div style="font-size: 0.75rem; color: #cbd5e1; line-height: 1.4; margin-bottom: 4px;">📍 ${branch.address}</div>
             <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px;">📞 ${branch.tel} / 👤 ${branch.manager}</div>
-            <div style="font-size: 0.72rem; font-weight: 700; color: ${isHq ? '#fbbf24' : (branch.status === 'active' ? '#34d399' : '#94a3b8')}; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 4px;">
+            <div style="font-size: 0.72rem; font-weight: 700; color: ${isHq ? '#fbbf24' : (branch.status === 'active' ? '#34d399' : '#94a3b8')}; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 4px; margin-bottom: ${branch.dashboard_url && !isHq ? '6px' : '0'};">
               ${isHq ? '👑 전국 9개 지부 총괄 기획 및 통합 관제 HQ' : (branch.status === 'active' ? `● 활성 사업: ${branch.active_projects_count}건 운영 중` : '○ 사업 연동 대기')}
             </div>
+            ${branch.dashboard_url && !isHq ? `<a href="${branch.dashboard_url}" target="_blank" style="display:block; text-align:center; font-size:0.75rem; font-weight:700; color:#fff; background:#0284c7; padding:4px 8px; border-radius:4px; text-decoration:none;">🚀 ${branch.short_name} 전용 관제 열기</a>` : ''}
           </div>
         `);
 
