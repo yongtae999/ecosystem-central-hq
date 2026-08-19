@@ -7,7 +7,7 @@
     "client": "기후부 금강유역환경청",
     "organizer": "(사)야생생물관리협회 대전충남세종지부",
     "status": "ongoing",
-    "status_label": "1·2차 완료 (지속관리 중)",
+    "status_label": "1·2차 제거 완료 (지속관리 중)",
     "target_species": ["가시박", "단풍잎돼지풀", "환삼덩굴"],
     "location_name": "충청남도 금산군 제원면 천내리습지 1·2·3구간",
     "lat": 36.126830,
@@ -22,7 +22,7 @@
     "live_dashboard_url": "https://yongtae999.github.io/geumgang-drone-monitor/",
     "is_representative": true,
     "features": ["초고해상도 드론 정사영상", "1·2·3구간 다각형 폴리곤", "Before/After 인터랙티브 슬라이더", "주간 활동일지 연동"],
-    "desc": "천내리습지 1·2·3구간 대상 드론 정밀 예찰 및 물리적 뿌리뽑기·예초 구제작업"
+    "desc": "천내리습지 1·2·3구간 생태계교란식물 1, 2차 제거작업 완료 (지속 모니터링 및 잔존 개체 예찰)"
   },
   {
     "id": "proj-dcs-doowoong-02",
@@ -32,7 +32,7 @@
     "client": "기후부 금강유역환경청",
     "organizer": "(사)야생생물관리협회 대전충남세종지부",
     "status": "ongoing",
-    "status_label": "실태조사 및 확산방지 중",
+    "status_label": "사업 계약 완료 (실태조사 예정)",
     "target_species": ["가시박", "환삼덩굴", "붉은귀거북", "황소개구리"],
     "location_name": "충청남도 태안군 원북면 신두리 1417 두웅습지 람사르습지보호지역",
     "lat": 36.832960,
@@ -41,12 +41,12 @@
     "pitch": 0,
     "bearing": 0,
     "period": "2026.04 ~ 2026.11",
-    "total_area_m2": 32000,
-    "total_harvest_kg": 410,
-    "drone_flights": 18,
+    "total_area_m2": 0,
+    "total_harvest_kg": 0,
+    "drone_flights": 0,
     "live_dashboard_url": "",
     "is_representative": false,
     "features": ["사구 배후습지 식생 보호", "양서류·파충류 서식지 정비", "교란식물 인력 굴취"],
-    "desc": "두웅습지 람사르습지보호지역 수면 및 탐방로 일원 외래생물 정밀 실태조사 및 확산 방지 포획·퇴치 용역"
+    "desc": "두웅습지 람사르습지보호지역 외래생물 실태조사 및 확산방지 용역 계약 체결 완료 (정밀 실태조사 착수 예정)"
   }
 ]
