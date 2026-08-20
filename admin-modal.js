@@ -10,11 +10,14 @@ class AdminModalManager {
     this.branchMgr = branchMgr;
     this.analyticsMgr = analyticsMgr;
     this.isPickingLocation = false;
+    this.selectedPhotos = []; // Max 5 compressed WebP photos
   }
 
   init() {
     this.bindButtons();
     this.bindFormEvents();
+    this.bindPhotoUploader();
+    this.bindYearRollover();
   }
 
   bindButtons() {
@@ -34,8 +37,19 @@ class AdminModalManager {
     const btnExport = document.getElementById('btn-export-json');
     if (btnExport) {
       btnExport.addEventListener('click', () => {
-        this.ds.exportDataJson();
+        const yearSelect = document.getElementById('year-dropdown-select');
+        const yr = yearSelect ? yearSelect.value : '2026';
+        this.ds.exportDataJson(yr);
         this.showToast('✅ 전체 사업 및 일지 데이터가 JSON 백업 파일로 다운로드되었습니다.');
+      });
+    }
+
+    // 4. Open Rollover Modal
+    const btnRollover = document.getElementById('btn-open-rollover-modal');
+    if (btnRollover) {
+      btnRollover.addEventListener('click', () => {
+        const modal = document.getElementById('modal-year-rollover');
+        if (modal) modal.classList.add('active');
       });
     }
 
@@ -83,6 +97,197 @@ class AdminModalManager {
     }
   }
 
+  bindPhotoUploader() {
+    const dropZone = document.getElementById('photo-drop-zone');
+    const fileInput = document.getElementById('act-photos-input');
+    if (!dropZone || !fileInput) return;
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files && e.dataTransfer.files.length) {
+        this.handlePhotoFiles(Array.from(e.dataTransfer.files));
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files.length) {
+        this.handlePhotoFiles(Array.from(e.target.files));
+      }
+    });
+  }
+
+  async handlePhotoFiles(files) {
+    const validImageFiles = files.filter(f => f.type.startsWith('image/'));
+    if (validImageFiles.length === 0) return;
+
+    const remainingSlots = 5 - this.selectedPhotos.length;
+    if (remainingSlots <= 0) {
+      alert('대표 사진은 최대 5장까지만 등록 가능합니다.');
+      return;
+    }
+
+    if (validImageFiles.length > remainingSlots) {
+      alert(`대표 사진은 최대 5장까지 가능합니다. 선택하신 사진 중 앞선 ${remainingSlots}장만 추가됩니다.`);
+    }
+
+    const filesToProcess = validImageFiles.slice(0, remainingSlots);
+
+    for (const file of filesToProcess) {
+      try {
+        const compressed = await this.compressImage(file, 1200, 0.75);
+        this.selectedPhotos.push({
+          name: file.name,
+          dataUrl: compressed.dataUrl,
+          sizeKb: compressed.sizeKb,
+          originalSizeKb: Math.round(file.size / 1024)
+        });
+      } catch (err) {
+        console.error('Photo compress error:', err);
+      }
+    }
+
+    this.renderPhotoPreviews();
+  }
+
+  compressImage(file, maxDim = 1200, quality = 0.75) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width;
+          let h = img.height;
+
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+
+          let dataUrl = canvas.toDataURL('image/webp', quality);
+          if (!dataUrl.startsWith('data:image/webp')) {
+            dataUrl = canvas.toDataURL('image/jpeg', quality);
+          }
+
+          const sizeKb = Math.round((dataUrl.length * 3) / 4 / 1024);
+          resolve({ dataUrl, sizeKb });
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  renderPhotoPreviews() {
+    const grid = document.getElementById('photo-preview-grid');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+    this.selectedPhotos.forEach((photo, idx) => {
+      const card = document.createElement('div');
+      card.className = `photo-preview-card ${idx === 0 ? 'rep' : ''}`;
+      card.innerHTML = `
+        <img src="${photo.dataUrl}" alt="${photo.name}">
+        <span class="photo-preview-badge">${idx === 0 ? '★ 대표' : '#' + (idx + 1)} (${photo.sizeKb}KB)</span>
+        <button type="button" class="photo-remove-btn" title="삭제">&times;</button>
+      `;
+
+      card.querySelector('.photo-remove-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.selectedPhotos.splice(idx, 1);
+        this.renderPhotoPreviews();
+      });
+
+      grid.appendChild(card);
+    });
+  }
+
+  bindYearRollover() {
+    const btnBackup = document.getElementById('btn-rollover-backup');
+    if (btnBackup) {
+      btnBackup.addEventListener('click', () => {
+        this.ds.archiveCurrentSeason('2026');
+        this.showToast('✅ 2026년도 전체 데이터 백업 파일이 생성되었습니다.');
+      });
+    }
+
+    const btnReset = document.getElementById('btn-rollover-reset');
+    if (btnReset) {
+      btnReset.addEventListener('click', () => {
+        const confirmed = confirm(
+          '⚠️ [2027년도 신규 시즌 시작 및 실적 초기화]\n\n' +
+          '1) 9개 지부 및 사업지 기본 좌표·구역 인프라는 100% 보존됩니다.\n' +
+          '2) 2026년도 실적은 자동으로 백업 저장됩니다.\n' +
+          '3) 회차별 작업일지 및 누적 실적(면적/수거량)이 0으로 초기화됩니다.\n\n' +
+          '신규 연도 시즌으로 초기화하시겠습니까?'
+        );
+
+        if (confirmed) {
+          this.ds.resetForNewSeason('2027');
+          this.refreshAllUI();
+          this.closeAllModals();
+          
+          const yearSelect = document.getElementById('year-dropdown-select');
+          if (yearSelect) {
+            yearSelect.innerHTML = `
+              <option value="2027" selected>📅 2027년도 (진행)</option>
+              <option value="2026">📁 2026년도 (아카이브)</option>
+              <option value="2025">📁 2025년도 (아카이브)</option>
+            `;
+          }
+
+          this.showToast('🚀 2027년도 신규 시즌이 성공적으로 시작되었습니다! (실적 0 초기화 완료)');
+        }
+      });
+    }
+
+    // Year Dropdown Selector
+    const yearSelect = document.getElementById('year-dropdown-select');
+    if (yearSelect) {
+      yearSelect.addEventListener('change', (e) => {
+        const selYear = e.target.value;
+        if (selYear === '2025' || selYear === '2026') {
+          const loaded = this.ds.loadArchivedYear(selYear);
+          if (loaded) {
+            this.refreshAllUI();
+            this.showToast(`📁 ${selYear}년도 아카이브 데이터를 열람 모드로 불러왔습니다.`);
+          } else {
+            this.showToast(`ℹ️ ${selYear}년도 아카이브 데이터가 로드되었습니다.`);
+          }
+        } else {
+          this.ds.loadInitialData().then(() => {
+            this.refreshAllUI();
+            this.showToast(`📅 ${selYear}년도 활성 관제 모드로 전환되었습니다.`);
+          });
+        }
+      });
+    }
+  }
+
   openNewProjectModal() {
     const modal = document.getElementById('modal-new-project');
     if (!modal) return;
@@ -101,6 +306,9 @@ class AdminModalManager {
   openActivityModal() {
     const modal = document.getElementById('modal-new-activity');
     if (!modal) return;
+
+    this.selectedPhotos = [];
+    this.renderPhotoPreviews();
 
     // Populate Branch Options
     const branchSelect = document.getElementById('act-branch-select');
@@ -261,6 +469,8 @@ class AdminModalManager {
       harvest_kg: harvest,
       location: proj ? proj.location_name : `${branch ? branch.short_name : ''} 관할 사업구역`,
       summary: summary || `${workType} 작업 완료 (인원 ${workers}명 투입, 면적 ${area.toLocaleString()}㎡ 관리)`,
+      photos_count: this.selectedPhotos.length,
+      photos: this.selectedPhotos.map(p => ({ name: p.name, dataUrl: p.dataUrl, sizeKb: p.sizeKb })),
       status: '완료'
     };
 
@@ -268,7 +478,8 @@ class AdminModalManager {
     this.refreshAllUI();
     this.closeAllModals();
 
-    this.showToast(`📋 [${newActivity.project_title}] 작업일지가 실시간 등록되었습니다 (+${area.toLocaleString()}㎡, +${harvest}kg)`);
+    const photoMsg = this.selectedPhotos.length > 0 ? ` 및 사진 ${this.selectedPhotos.length}장` : '';
+    this.showToast(`📋 [${newActivity.project_title}] 작업일지${photoMsg}가 실시간 등록되었습니다 (+${area.toLocaleString()}㎡, +${harvest}kg)`);
   }
 
   refreshAllUI() {

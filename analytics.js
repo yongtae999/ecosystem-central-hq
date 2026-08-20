@@ -148,7 +148,7 @@ class AnalyticsManager {
             },
             title: {
               display: true,
-              text: '실측 교란식물종별 방제 구성비 (%)',
+              text: '현장 식생 우점도(피도) 기준 비중 (%)',
               color: '#94a3b8',
               font: { size: 9, weight: 'bold' },
               padding: { top: 0, bottom: 4 }
@@ -169,6 +169,14 @@ class AnalyticsManager {
       const card = document.createElement('div');
       card.className = 'activity-card';
 
+      const photoThumbnails = act.photos && act.photos.length ? `
+        <div style="display: flex; gap: 4px; margin-top: 6px; overflow-x: auto;">
+          ${act.photos.map(p => `
+            <img src="${p.dataUrl}" alt="${p.name}" style="width: 48px; height: 36px; object-fit: cover; border-radius: 3px; border: 1px solid rgba(255,255,255,0.2);" title="${p.name}">
+          `).join('')}
+        </div>
+      ` : '';
+
       card.innerHTML = `
         <div class="activity-top">
           <span class="activity-branch">🏛️ ${act.branch_name}</span>
@@ -183,6 +191,7 @@ class AnalyticsManager {
         <div style="font-size: 0.65rem; color: var(--accent-emerald); margin-top: 4px;">
           인력 ${act.worker_count}명 · ${(act.area_m2).toLocaleString()}㎡ 관리 ${act.harvest_kg > 0 ? `· ${act.harvest_kg}kg 수거` : ''}
         </div>
+        ${photoThumbnails}
       `;
 
       container.appendChild(card);

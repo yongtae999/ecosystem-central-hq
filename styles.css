@@ -966,6 +966,133 @@ body {
 }
 
 /* ===================================================================
+   6.5. PHOTO UPLOADER & YEAR-END ROLLOVER
+   =================================================================== */
+.photo-upload-container {
+  margin-top: 6px;
+}
+
+.photo-drop-zone {
+  border: 2px dashed rgba(56, 189, 248, 0.4);
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: var(--radius-sm);
+  padding: 16px 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.photo-drop-zone:hover, .photo-drop-zone.dragover {
+  border-color: var(--color-cyan);
+  background: rgba(56, 189, 248, 0.08);
+  color: #fff;
+}
+
+.photo-drop-zone i {
+  font-size: 1.5rem;
+  color: var(--color-cyan);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.photo-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.photo-preview-card {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #000;
+}
+
+.photo-preview-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-preview-badge {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #38bdf8;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.photo-preview-card.rep .photo-preview-badge {
+  background: var(--color-amber);
+  color: #000;
+}
+
+.photo-remove-btn {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 18px;
+  height: 18px;
+  background: rgba(239, 68, 68, 0.85);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 0.65rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-remove-btn:hover {
+  background: #dc2626;
+}
+
+/* Rollover Modal Styling */
+.rollover-box {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.rollover-box h4 {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rollover-box p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.rollover-warning {
+  border-left: 3px solid var(--color-amber);
+  background: rgba(251, 191, 36, 0.08);
+  padding: 10px 12px;
+  border-radius: 4px;
+  margin-top: 10px;
+  font-size: 0.75rem;
+  color: #fef08a;
+}
+
+/* ===================================================================
    7. RESPONSIVE QUERIES
    =================================================================== */
 @media (max-width: 1200px) {
@@ -991,5 +1118,8 @@ body {
   }
   .species-checkbox-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .photo-preview-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }

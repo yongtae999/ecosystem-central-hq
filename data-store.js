@@ -131,9 +131,10 @@ class DataStore {
     return newAct;
   }
 
-  exportDataJson() {
+  exportDataJson(customYear = '2026') {
     const exportBundle = {
-      version: '1.0',
+      version: '2.0',
+      season_year: customYear,
       exported_at: new Date().toISOString(),
       branches: this.branches,
       projects: this.projects,
@@ -143,17 +144,63 @@ class DataStore {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportBundle, null, 2));
     const dlAnchorElem = document.createElement('a');
     dlAnchorElem.setAttribute("href", dataStr);
-    dlAnchorElem.setAttribute("download", `wma_ecosystem_backup_${new Date().toISOString().slice(0,10)}.json`);
+    dlAnchorElem.setAttribute("download", `wma_ecosystem_backup_${customYear}_${new Date().toISOString().slice(0,10)}.json`);
     dlAnchorElem.click();
+  }
+
+  archiveCurrentSeason(year = '2026') {
+    const archiveData = {
+      season_year: year,
+      archived_at: new Date().toISOString(),
+      projects: JSON.parse(JSON.stringify(this.projects)),
+      activities: JSON.parse(JSON.stringify(this.activities))
+    };
+    localStorage.setItem(`wma_ecosystem_archive_${year}`, JSON.stringify(archiveData));
+    this.exportDataJson(year);
+  }
+
+  resetForNewSeason(newYear = '2027') {
+    // 1. Archive current before reset
+    this.archiveCurrentSeason('2026');
+
+    // 2. Keep project metadata/coordinates, reset work stats to 0
+    this.projects.forEach(p => {
+      p.total_area_m2 = 0;
+      p.total_harvest_kg = 0;
+      p.drone_flights = 0;
+      p.period = `${newYear}.05 ~ ${newYear}.11`;
+      p.status_label = `${newYear}년도 새 시즌 착수 대기`;
+      p.desc = `${p.branch_name || ''} 주관 ${p.title} ${newYear}년도 현장 방제 및 관제 사업`;
+    });
+
+    // 3. Reset activities to empty
+    this.activities = [];
+
+    // 4. Save and reload
+    this.saveProjects();
+    this.saveActivities();
+    return true;
+  }
+
+  loadArchivedYear(year) {
+    const archiveRaw = localStorage.getItem(`wma_ecosystem_archive_${year}`);
+    if (archiveRaw) {
+      try {
+        const data = JSON.parse(archiveRaw);
+        this.projects = data.projects || [];
+        this.activities = data.activities || [];
+        this.recalculateBranchStats();
+        return true;
+      } catch (e) {
+        console.error('Failed to parse archive:', e);
+      }
+    }
+    return false;
   }
 
   resetToDefault() {
     localStorage.removeItem(this.STORAGE_KEY_PROJECTS);
     localStorage.removeItem(this.STORAGE_KEY_ACTIVITIES);
-    localStorage.removeItem('wma_ecosystem_projects_v1');
-    localStorage.removeItem('wma_ecosystem_projects_v2');
-    localStorage.removeItem('wma_ecosystem_activities_v1');
-    localStorage.removeItem('wma_ecosystem_activities_v2');
     window.location.reload();
   }
 }
