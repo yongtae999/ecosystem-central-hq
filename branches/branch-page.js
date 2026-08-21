@@ -44,7 +44,7 @@ class BranchMonitorApp {
       this.renderProjectsList();
       this.initMap();
 
-      // Subscribe to real-time updates from other branches & HQ
+      // Subscribe to real-time updates from other branches & HQ (BroadcastChannel)
       if (typeof BroadcastChannel !== 'undefined' && !this.bcSubscribed) {
         this.bcSubscribed = true;
         const bc = new BroadcastChannel('wma_ecosystem_national_channel');
@@ -52,6 +52,29 @@ class BranchMonitorApp {
           console.log(`📡 [BranchMonitor] Real-time sync update received for branch: ${this.branchId}`);
           this.init();
         };
+      }
+
+      // Subscribe to Cloud Realtime DB
+      if (window.cloudSync && !this.cloudSubscribed) {
+        this.cloudSubscribed = true;
+        window.cloudSync.init().then(() => {
+          window.cloudSync.subscribeToCloudData(() => {
+            console.log(`☁️ [BranchMonitor] Cloud sync update received for branch: ${this.branchId}`);
+            this.init();
+          });
+        });
+
+        const pill = document.getElementById('header-live-sync-pill');
+        window.cloudSync.onStatusChange((status) => {
+          if (!pill) return;
+          if (status === 'connected') {
+            pill.className = 'live-status-pill connected';
+            pill.innerHTML = '<span class="live-dot active"></span><span>전국 관제망 실시간 연동</span>';
+          } else {
+            pill.className = 'live-status-pill offline';
+            pill.innerHTML = '<span class="live-dot standby"></span><span>관제망 정상 연동</span>';
+          }
+        });
       }
     } catch (err) {
       console.error("Error loading branch app:", err);

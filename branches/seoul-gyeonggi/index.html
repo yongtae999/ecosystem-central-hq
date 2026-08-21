@@ -15,7 +15,11 @@
   <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
   <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
 
-  <link rel="stylesheet" href="../branch-style.css?v=20260821_1355">
+  <!-- Firebase 10.8 App & Realtime Database SDK (Nationwide Real-time Cloud Sync) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+  <link rel="stylesheet" href="../branch-style.css?v=20260821_1515">
 </head>
 <body>
 
@@ -32,7 +36,7 @@
           (사)야생생물관리협회 · 생태계교란생물 제거사업 지부 전용 모니터링 시스템
         </div>
       </div>
-      <div class="live-status-pill"><span class="live-dot"></span><span>관제망 정상 연동</span></div>
+      <div class="live-status-pill connected" id="header-live-sync-pill"><span class="live-dot active"></span><span>전국 관제망 실시간 연동</span></div>
     </div>
 
     <div class="header-controls">
@@ -107,7 +111,8 @@
     </aside>
   </main>
 
-  <script src="../branch-page.js?v=20260821_1355"></script>
+  <script src="../../cloud-sync.js?v=20260821_1515"></script>
+  <script src="../branch-page.js?v=20260821_1515"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const app = new BranchMonitorApp('seoul-gyeonggi');
