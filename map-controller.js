@@ -102,11 +102,17 @@ class MapController {
     this.map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
     this.map.addControl(new maplibregl.ScaleControl({ maxWidth: 100, unit: 'metric' }), 'bottom-left');
 
-    this.map.on('load', () => {
+    if (this.map.loaded()) {
       this.renderMarkers();
       this.updateHudTelemetry();
       this.bindToolbarEvents();
-    });
+    } else {
+      this.map.on('load', () => {
+        this.renderMarkers();
+        this.updateHudTelemetry();
+        this.bindToolbarEvents();
+      });
+    }
 
     this.map.on('move', () => this.updateHudTelemetry());
     this.map.on('zoom', () => this.updateHudTelemetry());
@@ -216,16 +222,23 @@ class MapController {
     svgWrap.style.width = '96px';
     svgWrap.style.height = '60px';
     svgWrap.style.cursor = 'pointer';
-    svgWrap.style.pointerEvents = 'auto';
 
     // Pure Mathematical Zero-Drift Single SVG Vector
     // Width: 96px, Height: 60px, Center X=48, Needle Tip=(48, 60)
-    // MapLibre anchor 'bottom' anchors (48, 60) directly to coordinates with 0px drift.
+    // MapLibre anchor 'bottom' positions (48, 60) directly on geographical coordinates
     svgWrap.innerHTML = `
       <svg width="96" height="60" viewBox="0 0 96 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.85));">
         ${hasPulse ? `
-          <circle cx="48" cy="60" r="6" fill="none" stroke="${pinFill}" stroke-width="2" class="svg-radar-wave-1"/>
-          <circle cx="48" cy="60" r="6" fill="none" stroke="${pinFill}" stroke-width="1.5" class="svg-radar-wave-2"/>
+          <circle cx="48" cy="60" r="4" fill="none" stroke="${pinFill}" stroke-width="2">
+            <animate attributeName="r" from="4" to="26" dur="2s" repeatCount="indefinite" />
+            <animate attributeName="opacity" from="0.9" to="0" dur="2s" repeatCount="indefinite" />
+            <animate attributeName="stroke-width" from="2" to="0.5" dur="2s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="48" cy="60" r="4" fill="none" stroke="${pinFill}" stroke-width="1.5">
+            <animate attributeName="r" from="4" to="26" dur="2s" begin="1s" repeatCount="indefinite" />
+            <animate attributeName="opacity" from="0.9" to="0" dur="2s" begin="1s" repeatCount="indefinite" />
+            <animate attributeName="stroke-width" from="1.5" to="0.5" dur="2s" begin="1s" repeatCount="indefinite" />
+          </circle>
         ` : ''}
 
         <!-- 1. Needle Pin Path (Center X=48, Needle Tip at 48, 60) -->
@@ -282,9 +295,7 @@ class MapController {
 
       const marker = new maplibregl.Marker({
         element: element,
-        anchor: 'bottom',
-        pitchAlignment: 'viewport',
-        rotationAlignment: 'viewport'
+        anchor: 'bottom'
       })
         .setLngLat([branch.lng, branch.lat])
         .setPopup(popup)
@@ -319,9 +330,7 @@ class MapController {
 
       const marker = new maplibregl.Marker({
         element: element,
-        anchor: 'bottom',
-        pitchAlignment: 'viewport',
-        rotationAlignment: 'viewport'
+        anchor: 'bottom'
       })
         .setLngLat([proj.lng, proj.lat])
         .setPopup(popup)

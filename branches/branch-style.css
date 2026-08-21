@@ -385,38 +385,13 @@ body {
   line-height: 1.45;
 }
 
-/* Zero-Drift Pure SVG Vector Marker Wrapper & SVG Radar Pulse */
+/* Zero-Drift Pure SVG Vector Marker Wrapper (Preserve MapLibre absolute transform positioning) */
 .hq-svg-marker-wrapper {
-  position: relative;
-  width: 96px !important;
-  height: 60px !important;
+  width: 96px;
+  height: 60px;
+  cursor: pointer;
+  pointer-events: auto;
   user-select: none;
-  contain: layout size;
-  transform-origin: 48px 60px;
-}
-
-@keyframes svg-radar-pulse {
-  0% {
-    r: 4px;
-    opacity: 0.95;
-    stroke-width: 2.5px;
-  }
-  100% {
-    r: 28px;
-    opacity: 0;
-    stroke-width: 0.5px;
-  }
-}
-
-.svg-radar-wave-1 {
-  animation: svg-radar-pulse 2.2s infinite cubic-bezier(0.1, 0.7, 0.4, 1);
-  transform-origin: 48px 60px;
-}
-
-.svg-radar-wave-2 {
-  animation: svg-radar-pulse 2.2s infinite cubic-bezier(0.1, 0.7, 0.4, 1);
-  animation-delay: 1.1s;
-  transform-origin: 48px 60px;
 }
 
 .maplibregl-popup-content {
