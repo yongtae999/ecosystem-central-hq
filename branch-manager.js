@@ -158,7 +158,7 @@ class BranchManager {
           <div class="species-chip-list">
             ${proj.target_species.map(sp => {
               const isAnimal = ['붉은귀거북', '황소개구리', '뉴트리아', '미국가재', '배스', '블루길'].some(a => sp.includes(a));
-              return `<span class="species-chip ${isAnimal ? 'animal' : ''}">🌿 ${sp}</span>`;
+              return `<span class="species-chip ${isAnimal ? 'animal' : ''}">${isAnimal ? '🐸' : '🌿'} ${sp}</span>`;
             }).join('')}
           </div>
         `;

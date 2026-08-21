@@ -322,6 +322,7 @@ class MapController {
           <div style="padding: 6px 4px; font-family: -apple-system, 'Pretendard', sans-serif; min-width: 230px;">
             <div style="font-size: 0.9rem; font-weight: 800; color: #34d399; margin-bottom: 4px;">🌿 ${proj.title}</div>
             <div style="font-size: 0.74rem; color: #94a3b8; margin-bottom: 3px;">발주처: ${proj.client}</div>
+            ${proj.target_species && proj.target_species.length ? `<div style="font-size: 0.72rem; color: #fbbf24; margin-bottom: 3px;">🎯 대상종: <b>${proj.target_species.join(', ')}</b></div>` : ''}
             <div style="font-size: 0.74rem; color: #cbd5e1; margin-bottom: 4px;">위치: ${proj.location_name}</div>
             <div style="font-size: 0.75rem; font-weight: 700; color: #38bdf8; margin-bottom: 6px;">실적: ${(Number(proj.total_area_m2)).toLocaleString()}㎡ (${(proj.total_harvest_kg).toLocaleString()}kg 수거)</div>
             ${proj.live_dashboard_url ? `<a href="${proj.live_dashboard_url}" target="_blank" style="display:block; text-align:center; font-size:0.75rem; font-weight:700; color:#fff; background:#0284c7; padding:5px 8px; border-radius:4px; text-decoration:none;">🚀 지부 3D 드론 관제 열기</a>` : ''}
