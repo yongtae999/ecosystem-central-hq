@@ -53,6 +53,43 @@ class AdminModalManager {
       });
     }
 
+    // 5. Open Cloud Sync Status Modal
+    const statusPill = document.getElementById('header-live-sync-pill');
+    if (statusPill) {
+      statusPill.style.cursor = 'pointer';
+      statusPill.addEventListener('click', () => {
+        const modal = document.getElementById('modal-cloud-sync');
+        if (modal) {
+          const statProj = document.getElementById('cloud-stat-projects');
+          const statAct = document.getElementById('cloud-stat-activities');
+          const statTime = document.getElementById('cloud-stat-time');
+          if (statProj) statProj.textContent = `${this.ds.projects.length}건`;
+          if (statAct) statAct.textContent = `${this.ds.activities.length}건`;
+          if (statTime && window.cloudSync && window.cloudSync.lastSyncTime) {
+            statTime.textContent = window.cloudSync.lastSyncTime.toLocaleTimeString('ko-KR');
+          }
+          modal.classList.add('active');
+        }
+      });
+    }
+
+    // 6. Force Cloud Sync Push Button
+    const btnForceSync = document.getElementById('btn-force-cloud-sync');
+    if (btnForceSync) {
+      btnForceSync.addEventListener('click', async () => {
+        if (window.cloudSync) {
+          btnForceSync.disabled = true;
+          btnForceSync.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>전국 클라우드 동기화 전송 중...</span>';
+          await window.cloudSync.syncAll(this.ds.projects, this.ds.activities);
+          setTimeout(() => {
+            btnForceSync.disabled = false;
+            btnForceSync.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> <span>전국 클라우드 DB 즉시 전체 동기화</span>';
+            this.showToast('🚀 전국 9개 지부 및 본부에 최신 데이터가 성공적으로 일괄 동기화되었습니다!');
+          }, 800);
+        }
+      });
+    }
+
     // Modal Close Buttons
     document.querySelectorAll('.modal-close-btn, .modal-backdrop').forEach(el => {
       el.addEventListener('click', (e) => {
