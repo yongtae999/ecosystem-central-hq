@@ -180,40 +180,43 @@ class BranchMonitorApp {
     this.map.on('load', () => {
       // 1. Add Branch Office Marker (Zero-Drift Vector)
       const branchWrap = document.createElement('div');
+      branchWrap.className = 'hq-svg-marker-wrapper';
       branchWrap.style.width = '96px';
-      branchWrap.style.height = '62px';
+      branchWrap.style.height = '60px';
       branchWrap.innerHTML = `
-        <svg width="96" height="62" viewBox="0 0 96 62" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.9));">
+        <svg width="96" height="60" viewBox="0 0 96 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.85));">
+          <path d="M 38 35 C 38 35 39 48 48 60 C 57 48 58 35 58 35 A 10 10 0 1 0 38 35 Z" fill="#0284c7" stroke="#ffffff" stroke-width="2"/>
+          <circle cx="48" cy="35" r="3.5" fill="#ffffff"/>
           <rect x="4" y="2" width="88" height="23" rx="4" fill="#082f49" stroke="#38bdf8" stroke-width="1.5"/>
           <text x="48" y="17.5" text-anchor="middle" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Pretendard', sans-serif" font-size="11" font-weight="800">
             🏛️ ${b.short_name}
           </text>
-          <path d="M 38 35 C 38 35 39 48 48 59 C 57 48 58 35 58 35 A 10 10 0 1 0 38 35 Z" fill="#0284c7" stroke="#ffffff" stroke-width="2"/>
-          <circle cx="48" cy="35" r="4" fill="#ffffff"/>
         </svg>
       `;
 
-      new maplibregl.Marker({ element: branchWrap, anchor: 'bottom' })
+      new maplibregl.Marker({ element: branchWrap, anchor: 'bottom', pitchAlignment: 'viewport', rotationAlignment: 'viewport' })
         .setLngLat([b.lng, b.lat])
         .addTo(this.map);
 
       // 2. Add Project Markers if any
       this.projectsData.forEach(p => {
         const pWrap = document.createElement('div');
+        pWrap.className = 'hq-svg-marker-wrapper';
         pWrap.style.width = '96px';
-        pWrap.style.height = '62px';
+        pWrap.style.height = '60px';
         pWrap.innerHTML = `
-          <div class="radar-pulse-ring"></div>
-          <svg width="96" height="62" viewBox="0 0 96 62" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.9)); position:relative; z-index:2;">
+          <svg width="96" height="60" viewBox="0 0 96 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.85));">
+            <circle cx="48" cy="60" r="6" fill="none" stroke="#10b981" stroke-width="2" class="svg-radar-wave-1"/>
+            <circle cx="48" cy="60" r="6" fill="none" stroke="#10b981" stroke-width="1.5" class="svg-radar-wave-2"/>
+            <path d="M 38 35 C 38 35 39 48 48 60 C 57 48 58 35 58 35 A 10 10 0 1 0 38 35 Z" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
+            <circle cx="48" cy="35" r="3.5" fill="#ffffff"/>
             <rect x="4" y="2" width="88" height="23" rx="4" fill="#022c22" stroke="#34d399" stroke-width="1.5"/>
             <text x="48" y="17.5" text-anchor="middle" fill="#a7f3d0" font-family="-apple-system, BlinkMacSystemFont, 'Pretendard', sans-serif" font-size="11" font-weight="800">
               🌿 ${p.title.slice(0, 5)}...
             </text>
-            <path d="M 38 35 C 38 35 39 48 48 59 C 57 48 58 35 58 35 A 10 10 0 1 0 38 35 Z" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
-            <circle cx="48" cy="35" r="4" fill="#ffffff"/>
           </svg>
         `;
-        new maplibregl.Marker({ element: pWrap, anchor: 'bottom' })
+        new maplibregl.Marker({ element: pWrap, anchor: 'bottom', pitchAlignment: 'viewport', rotationAlignment: 'viewport' })
           .setLngLat([p.lng, p.lat])
           .addTo(this.map);
       });

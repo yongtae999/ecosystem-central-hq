@@ -214,26 +214,29 @@ class MapController {
     const svgWrap = document.createElement('div');
     svgWrap.className = 'hq-svg-marker-wrapper';
     svgWrap.style.width = '96px';
-    svgWrap.style.height = '62px';
+    svgWrap.style.height = '60px';
     svgWrap.style.cursor = 'pointer';
     svgWrap.style.pointerEvents = 'auto';
 
-    // Optional Radar Pulse Wave Ring
-    const pulseHtml = hasPulse ? '<div class="radar-pulse-ring"></div>' : '';
-
-    // Mathematically aligned single SVG vector (Center X=48, Needle Tip=(48, 59))
+    // Pure Mathematical Zero-Drift Single SVG Vector
+    // Width: 96px, Height: 60px, Center X=48, Needle Tip=(48, 60)
+    // MapLibre anchor 'bottom' anchors (48, 60) directly to coordinates with 0px drift.
     svgWrap.innerHTML = `
-      ${pulseHtml}
-      <svg width="96" height="62" viewBox="0 0 96 62" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.9)); position:relative; z-index:2;">
-        <!-- 1. Top Badge Box (Center X=48) -->
+      <svg width="96" height="60" viewBox="0 0 96 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.85));">
+        ${hasPulse ? `
+          <circle cx="48" cy="60" r="6" fill="none" stroke="${pinFill}" stroke-width="2" class="svg-radar-wave-1"/>
+          <circle cx="48" cy="60" r="6" fill="none" stroke="${pinFill}" stroke-width="1.5" class="svg-radar-wave-2"/>
+        ` : ''}
+
+        <!-- 1. Needle Pin Path (Center X=48, Needle Tip at 48, 60) -->
+        <path d="M 38 35 C 38 35 39 48 48 60 C 57 48 58 35 58 35 A 10 10 0 1 0 38 35 Z" fill="${pinFill}" stroke="#ffffff" stroke-width="2"/>
+        <circle cx="48" cy="35" r="3.5" fill="#ffffff"/>
+
+        <!-- 2. Top Badge Box (Center X=48) -->
         <rect x="4" y="2" width="88" height="23" rx="4" fill="${bgLabel}" stroke="${strokeLabel}" stroke-width="1.5"/>
         <text x="48" y="17.5" text-anchor="middle" fill="${textLabelColor}" font-family="-apple-system, BlinkMacSystemFont, 'Pretendard', sans-serif" font-size="11" font-weight="800" letter-spacing="-0.2px">
           ${iconSymbol} ${title}
         </text>
-
-        <!-- 2. Needle Pin Path (Center X=48, Tip at 48, 59) -->
-        <path d="M 38 35 C 38 35 39 48 48 59 C 57 48 58 35 58 35 A 10 10 0 1 0 38 35 Z" fill="${pinFill}" stroke="#ffffff" stroke-width="2"/>
-        <circle cx="48" cy="35" r="4" fill="#ffffff"/>
       </svg>
     `;
 
@@ -262,7 +265,7 @@ class MapController {
         if (this.onSelectBranch) this.onSelectBranch(branch.id);
       });
 
-      const popup = new maplibregl.Popup({ offset: 32, closeButton: false })
+      const popup = new maplibregl.Popup({ offset: [0, -60], closeButton: false })
         .setHTML(`
           <div style="padding: 6px 4px; font-family: -apple-system, 'Pretendard', sans-serif; min-width: 230px;">
             <div style="font-size: 0.92rem; font-weight: 800; color: ${isHq ? '#fbbf24' : '#38bdf8'}; margin-bottom: 5px;">
@@ -303,7 +306,7 @@ class MapController {
         if (this.onSelectProject) this.onSelectProject(proj.id);
       });
 
-      const popup = new maplibregl.Popup({ offset: 32, closeButton: false })
+      const popup = new maplibregl.Popup({ offset: [0, -60], closeButton: false })
         .setHTML(`
           <div style="padding: 6px 4px; font-family: -apple-system, 'Pretendard', sans-serif; min-width: 230px;">
             <div style="font-size: 0.9rem; font-weight: 800; color: #34d399; margin-bottom: 4px;">🌿 ${proj.title}</div>

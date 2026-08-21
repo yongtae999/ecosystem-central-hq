@@ -807,27 +807,38 @@ body {
   box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
 }
 
-/* Radar Pulse Animation for Map Pins */
+/* Zero-Drift Pure SVG Vector Marker Wrapper & SVG Radar Pulse */
 .hq-svg-marker-wrapper {
   position: relative;
+  width: 96px !important;
+  height: 60px !important;
+  user-select: none;
+  contain: layout size;
+  transform-origin: 48px 60px;
 }
 
-.radar-pulse-ring {
-  position: absolute;
-  bottom: 3px;
-  left: 48px;
-  transform: translate(-50%, 50%);
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 2px solid #10b981;
-  pointer-events: none;
-  animation: radar-pulse 2.2s infinite ease-out;
+@keyframes svg-radar-pulse {
+  0% {
+    r: 4px;
+    opacity: 0.95;
+    stroke-width: 2.5px;
+  }
+  100% {
+    r: 28px;
+    opacity: 0;
+    stroke-width: 0.5px;
+  }
 }
 
-@keyframes radar-pulse {
-  0% { transform: translate(-50%, 50%) scale(0.2); opacity: 1; }
-  100% { transform: translate(-50%, 50%) scale(2.4); opacity: 0; }
+.svg-radar-wave-1 {
+  animation: svg-radar-pulse 2.2s infinite cubic-bezier(0.1, 0.7, 0.4, 1);
+  transform-origin: 48px 60px;
+}
+
+.svg-radar-wave-2 {
+  animation: svg-radar-pulse 2.2s infinite cubic-bezier(0.1, 0.7, 0.4, 1);
+  animation-delay: 1.1s;
+  transform-origin: 48px 60px;
 }
 
 /* MapLibre Glassmorphism Popup */
