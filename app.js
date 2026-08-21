@@ -6,6 +6,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
   console.log("🚀 Initializing WMA National Ecosystem Monitoring Platform (Central HQ)...");
 
+  // 0. Start Live Real-time KST Clock
+  startKstClock();
+
   // 1. Load Data via DataStore (LocalStorage + Seed JSON)
   const { branches, projects, activities } = await window.dataStore.loadInitialData();
 
@@ -54,4 +57,39 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
   }
+
+  // 8. ESC Key Global Modal & Lightbox Closer
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+    }
+  });
 });
+
+/**
+ * Real-time KST Clock Ticker (UTC+9)
+ */
+function startKstClock() {
+  const clockEl = document.getElementById('header-kst-clock');
+  if (!clockEl) return;
+
+  const update = () => {
+    const now = new Date();
+    const kstOffset = 9 * 60; // UTC+9 minutes
+    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const kstDate = new Date(utc + (kstOffset * 60000));
+
+    const yyyy = kstDate.getFullYear();
+    const mm = String(kstDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(kstDate.getDate()).padStart(2, '0');
+    const hh = String(kstDate.getHours()).padStart(2, '0');
+    const min = String(kstDate.getMinutes()).padStart(2, '0');
+    const ss = String(kstDate.getSeconds()).padStart(2, '0');
+
+    clockEl.textContent = `${yyyy}.${mm}.${dd} ${hh}:${min}:${ss} KST`;
+  };
+
+  update();
+  setInterval(update, 1000);
+}
+

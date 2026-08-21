@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>(사)야생생물관리협회 전국 생태계교란생물 제거사업 중앙사무국 총괄 관제 플랫폼</title>
 
-  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <!-- Typography: Pretendard, Inter, JetBrains Mono, Share Tech Mono -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
   <!-- FontAwesome 6.4 Free CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -21,7 +22,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Main Tactical Theme CSS -->
-  <link rel="stylesheet" href="styles.css?v=20260819_0755">
+  <link rel="stylesheet" href="styles.css?v=20260821_1355">
 </head>
 <body class="theme-tactical">
 
@@ -38,9 +39,19 @@
           (사)야생생물관리협회 · 전국 9개 시·도 지부 드론 GIS 통합 모니터링 시스템
         </div>
       </div>
+      <div class="live-status-pill">
+        <span class="live-dot"></span>
+        <span>관제망 정상 가동</span>
+      </div>
     </div>
 
     <div class="header-controls">
+      <!-- Real-time KST Clock -->
+      <div class="live-clock-pill" title="중앙 관제 서버 동기화 시간 (KST)">
+        <i class="fa-regular fa-clock"></i>
+        <span id="header-kst-clock">2026.08.21 13:50:00 KST</span>
+      </div>
+
       <!-- 9 Branches Dropdown Selector -->
       <div class="branch-select-wrap">
         <i class="fa-solid fa-location-crosshairs"></i>
@@ -59,9 +70,9 @@
       </div>
 
       <!-- Year Selector -->
-      <div class="branch-select-wrap" style="min-width: 145px;">
+      <div class="branch-select-wrap" style="min-width: 135px;">
         <i class="fa-solid fa-calendar-days"></i>
-        <select id="year-dropdown-select" class="branch-dropdown" style="font-weight: 700; color: var(--color-cyan);">
+        <select id="year-dropdown-select" class="branch-dropdown" style="font-weight: 700; color: var(--accent-cyan);">
           <option value="2026" selected>📅 2026년도 (진행)</option>
           <option value="2025">📁 2025년도 (아카이브)</option>
         </select>
@@ -106,7 +117,14 @@
           <div class="section-title">
             <i class="fa-solid fa-building-flag"></i> 전국 9개 공식 지부
           </div>
-          <span class="section-badge">실시간 연동</span>
+          <span class="section-badge live-sync-badge"><i class="fa-solid fa-arrows-rotate"></i> 실시간 연동</span>
+        </div>
+
+        <!-- Branch State Filter Tabs -->
+        <div class="branch-filter-tabs" id="branch-filter-tabs">
+          <button class="branch-filter-tab active" data-filter="all">전체 (9)</button>
+          <button class="branch-filter-tab" data-filter="active"><span class="tab-dot active"></span> 가동 중 (1)</button>
+          <button class="branch-filter-tab" data-filter="standby"><span class="tab-dot standby"></span> 대기 (8)</button>
         </div>
         
         <div class="branch-grid" id="branch-cards-container">
@@ -134,6 +152,12 @@
     <section class="center-stage">
       <div id="map-viewport" class="map-viewport"></div>
 
+      <!-- Tactical Corner Brackets Overlay -->
+      <div class="tactical-corner tl"></div>
+      <div class="tactical-corner tr"></div>
+      <div class="tactical-corner bl"></div>
+      <div class="tactical-corner br"></div>
+
       <!-- Real-time Tactical Center Sight -->
       <div class="map-center-sight">
         <div class="sight-ring"></div>
@@ -143,6 +167,20 @@
         <div class="sight-line right"></div>
         <div class="sight-dot"></div>
         <div class="sight-tag" id="sight-coord-tag">36.300000° N, 127.500000° E</div>
+      </div>
+
+      <!-- Map Floating Toolbar -->
+      <div class="map-floating-toolbar">
+        <div class="toolbar-group">
+          <button id="btn-layer-satellite" class="map-tool-btn active" title="고해상도 위성영상"><i class="fa-solid fa-satellite"></i> <span>위성</span></button>
+          <button id="btn-layer-hybrid" class="map-tool-btn" title="하이브리드 (위성 + 주요 도로/지명)"><i class="fa-solid fa-layer-group"></i> <span>하이브리드</span></button>
+          <button id="btn-layer-street" class="map-tool-btn" title="일반 행정구역 지도"><i class="fa-solid fa-map"></i> <span>지도</span></button>
+        </div>
+        <div class="toolbar-divider"></div>
+        <div class="toolbar-group">
+          <button id="btn-toggle-3d" class="map-tool-btn" title="2D 탑뷰 / 3D 틸트 뷰 전환"><i class="fa-solid fa-cube"></i> <span id="label-3d-toggle">3D 틸트</span></button>
+          <button id="btn-reset-national" class="map-tool-btn" title="전국 지도 중앙 뷰 리셋"><i class="fa-solid fa-earth-asia"></i> <span>전국 뷰</span></button>
+        </div>
       </div>
 
       <!-- Tactical HUD Overlay -->
@@ -171,42 +209,52 @@
           <div class="section-title">
             <i class="fa-solid fa-chart-line"></i> 전국 종합 사업 실적 롤업
           </div>
-          <span class="section-badge" style="color: var(--accent-amber);">실시간 집계</span>
+          <span class="section-badge" style="color: var(--accent-amber);"><i class="fa-solid fa-bolt"></i> 실시간 집계</span>
         </div>
         
         <div class="kpi-grid">
           <div class="kpi-box primary">
+            <div class="kpi-icon-wrap"><i class="fa-solid fa-vector-square"></i></div>
             <span class="kpi-label">전국 총 누적 작업면적</span>
-            <span class="kpi-val"><span id="kpi-total-area">98,000</span> <small>㎡</small></span>
+            <span class="kpi-val"><span id="kpi-total-area">102,000</span> <small>㎡</small></span>
           </div>
           <div class="kpi-box emerald">
+            <div class="kpi-icon-wrap"><i class="fa-solid fa-weight-hanging"></i></div>
             <span class="kpi-label">전국 총 교란종 수거량</span>
-            <span class="kpi-val"><span id="kpi-total-harvest">1,290</span> <small>kg</small></span>
+            <span class="kpi-val"><span id="kpi-total-harvest">2,080</span> <small>kg</small></span>
           </div>
           <div class="kpi-box amber">
+            <div class="kpi-icon-wrap"><i class="fa-solid fa-folder-open"></i></div>
             <span class="kpi-label">전국 총 운영 사업수</span>
             <span class="kpi-val"><span id="kpi-active-projects">2</span> <small>개 사업</small></span>
           </div>
           <div class="kpi-box purple">
+            <div class="kpi-icon-wrap"><i class="fa-solid fa-tower-broadcast"></i></div>
             <span class="kpi-label">전국 지부 가동 현황</span>
-            <span class="kpi-val" style="font-size: 0.82rem; color: #a855f7;"><span id="kpi-active-branches">대전충남세종 2개 사업 가동 (8개 지부 대기)</span></span>
+            <span class="kpi-val" style="font-size: 0.82rem; color: #c084fc;"><span id="kpi-active-branches">대전충남세종 2개 사업 가동 (8개 지부 대기)</span></span>
           </div>
         </div>
       </div>
 
       <!-- Real-time Comparison Charts -->
       <div class="sidebar-section">
-        <div class="section-header">
+        <div class="section-header" style="flex-wrap: wrap; gap: 6px;">
           <div class="section-title">
             <i class="fa-solid fa-chart-bar"></i> 지부별 실적 분석
           </div>
+          <!-- Chart Mode Switcher: Dual-Axis Balance, Area, Harvest -->
+          <div class="chart-view-toggle" id="chart-view-toggle">
+            <button class="chart-tab active" data-view="both" title="면적과 수거량을 듀얼 축으로 비례 균형 비교">통합 밸런스</button>
+            <button class="chart-tab" data-view="area" title="작업면적 단독 보기">작업면적</button>
+            <button class="chart-tab" data-view="harvest" title="수거량 단독 보기">수거량</button>
+          </div>
         </div>
         
-        <div class="chart-container" style="height: 280px; margin-bottom: 8px;">
+        <div class="chart-container" style="height: 275px; margin-bottom: 8px;">
           <canvas id="branchComparisonChart"></canvas>
         </div>
 
-        <div class="chart-container" style="height: 110px;">
+        <div class="chart-container" style="height: 115px;">
           <canvas id="speciesDistributionChart"></canvas>
         </div>
       </div>
@@ -461,12 +509,26 @@
     </div>
   </div>
 
+  <!-- ===================================================================
+       MODAL 4: IMAGE LIGHTBOX VIEWER
+       =================================================================== -->
+  <div class="modal-overlay" id="modal-lightbox">
+    <div class="modal-backdrop"></div>
+    <div class="lightbox-card">
+      <button class="lightbox-close-btn modal-close-btn" title="닫기">&times;</button>
+      <div class="lightbox-media-wrap">
+        <img id="lightbox-img" src="" alt="현장 사진 확대보기">
+      </div>
+      <div class="lightbox-caption" id="lightbox-caption"></div>
+    </div>
+  </div>
+
   <!-- App Modules -->
-  <script src="data-store.js?v=20260820_1537"></script>
-  <script src="map-controller.js?v=20260820_1537"></script>
-  <script src="branch-manager.js?v=20260820_1537"></script>
-  <script src="analytics.js?v=20260820_1537"></script>
-  <script src="admin-modal.js?v=20260820_1537"></script>
-  <script src="app.js?v=20260820_1537"></script>
+  <script src="data-store.js?v=20260821_1355"></script>
+  <script src="map-controller.js?v=20260821_1355"></script>
+  <script src="branch-manager.js?v=20260821_1355"></script>
+  <script src="analytics.js?v=20260821_1355"></script>
+  <script src="admin-modal.js?v=20260821_1355"></script>
+  <script src="app.js?v=20260821_1355"></script>
 </body>
 </html>

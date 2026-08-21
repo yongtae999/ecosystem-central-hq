@@ -1,6 +1,6 @@
 /**
  * Branch & Project Manager Module
- * Manages 9 Official WMA Branches, Multi-Project Navigation & Deep-links
+ * Manages 9 Official WMA Branches, Multi-Project Navigation, Species Tags & Deep-links
  */
 
 class BranchManager {
@@ -9,13 +9,27 @@ class BranchManager {
     this.branches = [];
     this.projects = [];
     this.activeBranchId = 'all'; // 'all' or specific branch id
+    this.stateFilter = 'all'; // 'all' | 'active' | 'standby'
   }
 
   init(branchesData, projectsData) {
     this.branches = branchesData || [];
     this.projects = projectsData || [];
+    this.bindFilterTabs();
     this.renderBranchCards();
     this.renderBranchProjects();
+  }
+
+  bindFilterTabs() {
+    const tabs = document.querySelectorAll('#branch-filter-tabs .branch-filter-tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        this.stateFilter = tab.dataset.filter || 'all';
+        this.renderBranchCards();
+      });
+    });
   }
 
   setBranchFilter(branchId) {
@@ -47,7 +61,24 @@ class BranchManager {
 
     container.innerHTML = '';
 
-    this.branches.filter(b => !b.is_hq).forEach((branch) => {
+    let list = this.branches.filter(b => !b.is_hq);
+
+    if (this.stateFilter === 'active') {
+      list = list.filter(b => b.status === 'active');
+    } else if (this.stateFilter === 'standby') {
+      list = list.filter(b => b.status !== 'active');
+    }
+
+    if (list.length === 0) {
+      container.innerHTML = `
+        <div style="color: var(--text-muted); font-size: 0.75rem; text-align: center; padding: 20px; background: rgba(6,9,14,0.4); border-radius: var(--radius-sm); border: 1px dashed var(--border-subtle);">
+          선택한 조건의 지부가 없습니다.
+        </div>
+      `;
+      return;
+    }
+
+    list.forEach((branch) => {
       const card = document.createElement('div');
       const isActive = branch.status === 'active';
       card.className = `branch-card ${this.activeBranchId === branch.id ? 'active' : ''}`;
@@ -56,16 +87,17 @@ class BranchManager {
       card.innerHTML = `
         <div class="branch-card-header">
           <span class="branch-name">
+            ${isActive ? '<span class="branch-pulse-beacon"></span>' : ''}
             🏛️ ${branch.name}
           </span>
-          <span class="branch-status-pill" style="${isActive ? '' : 'background: rgba(148, 163, 184, 0.15); color: #94a3b8; border-color: rgba(148, 163, 184, 0.3);'}">
-            ${isActive ? `사업 ${branch.active_projects_count}건 운영` : '연동 준비 중'}
+          <span class="branch-status-pill" style="${isActive ? '' : 'background: rgba(148, 163, 184, 0.12); color: #94a3b8; border-color: rgba(148, 163, 184, 0.25);'}">
+            ${isActive ? `운영 ${branch.active_projects_count}건` : '연동 대기'}
           </span>
         </div>
         <div class="branch-meta">
           📍 ${branch.address}<br>
-          📞 전화: ${branch.tel} / FAX: ${branch.fax}<br>
-          👤 ${branch.manager}
+          📞 전화: ${branch.tel} · FAX: ${branch.fax}<br>
+          👤 ${branch.leader ? branch.leader : ''} ${branch.manager ? `· ${branch.manager}` : ''}
         </div>
         <div class="branch-stats-row">
           <span>작업면적: <b>${isActive ? (branch.total_work_area_m2).toLocaleString() + ' ㎡' : '-'}</b></span>
@@ -119,15 +151,29 @@ class BranchManager {
       const card = document.createElement('div');
       card.className = 'project-card';
 
+      // Species tag chips
+      let speciesChips = '';
+      if (proj.target_species && Array.isArray(proj.target_species)) {
+        speciesChips = `
+          <div class="species-chip-list">
+            ${proj.target_species.map(sp => {
+              const isAnimal = ['붉은귀거북', '황소개구리', '뉴트리아', '미국가재', '배스', '블루길'].some(a => sp.includes(a));
+              return `<span class="species-chip ${isAnimal ? 'animal' : ''}">🌿 ${sp}</span>`;
+            }).join('')}
+          </div>
+        `;
+      }
+
       card.innerHTML = `
         <div class="project-card-title">
           <span>🌿 ${proj.title}</span>
-          <span class="project-client-badge">${proj.client.split('/')[0]}</span>
+          <span class="project-client-badge">${proj.client ? proj.client.split('/')[0] : '기후부'}</span>
         </div>
+        ${speciesChips}
         <div class="project-meta-row">
-          <span style="color: var(--accent-emerald);">● ${proj.status_label}</span> · 📅 ${proj.period}<br>
-          📍 ${proj.location_name}<br>
-          📊 실적: <b>${(proj.total_area_m2).toLocaleString()}㎡</b> (${(proj.total_harvest_kg).toLocaleString()}kg 수거) · 드론 ${proj.drone_flights}회
+          <span style="color: var(--accent-emerald); font-weight: 700;">● ${proj.status_label}</span><br>
+          📅 ${proj.period} · 📍 ${proj.location_name}<br>
+          📊 실적: <b>${(proj.total_area_m2).toLocaleString()}㎡</b> (${(proj.total_harvest_kg).toLocaleString()}kg 수거) ${proj.drone_flights ? `· 드론 ${proj.drone_flights}회` : ''}
         </div>
         <div class="project-btn-row">
           <button class="btn-tactical secondary" style="flex: 1; padding: 4px;" onclick="window.mapCtrl.flyToProject('${proj.id}')">
@@ -135,11 +181,11 @@ class BranchManager {
           </button>
           ${proj.live_dashboard_url ? `
             <a href="${proj.live_dashboard_url}" target="_blank" class="btn-open-branch-app" title="해당 지부 전용 3D 드론 정사영상 관제 웹사이트로 이동">
-              <i class="fa-solid fa-arrow-up-right-from-square"></i> 지부 드론 관제 열기
+              <i class="fa-solid fa-plane-up"></i> 드론 관제
             </a>
           ` : `
             <button class="btn-tactical" style="flex: 1; padding: 4px; opacity: 0.6; cursor: default;" title="해당 사업 관제 시스템 준비 중">
-              <i class="fa-solid fa-clock"></i> 전용 관제 준비 중
+              <i class="fa-solid fa-clock"></i> 관제 준비 중
             </button>
           `}
         </div>
@@ -151,3 +197,4 @@ class BranchManager {
 }
 
 window.BranchManager = BranchManager;
+

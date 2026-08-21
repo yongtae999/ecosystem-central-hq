@@ -1,6 +1,6 @@
 /**
- * National Map Controller Module (MapLibre GL JS High-Reliability Satellite Engine)
- * Visualizes Central HQ, 9 Branches & Projects with 100% Mathematically Fixed SVG Vector Pins
+ * National Map Controller Module (MapLibre GL JS High-Reliability Satellite & Hybrid Engine)
+ * Visualizes Central HQ, 9 Branches & Projects with 100% Mathematically Fixed SVG Vector Pins & Radar Waves
  */
 
 class MapController {
@@ -12,6 +12,8 @@ class MapController {
     this.markers = [];
     this.onSelectBranch = null;
     this.onSelectProject = null;
+    this.currentLayer = 'satellite'; // 'satellite' | 'hybrid' | 'street'
+    this.is3d = false;
   }
 
   init(branchesData, projectsData) {
@@ -29,10 +31,32 @@ class MapController {
           'satellite-tiles': {
             type: 'raster',
             tiles: [
+              'https://mt0.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+              'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+              'https://mt2.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+              'https://mt3.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
+            ],
+            tileSize: 256,
+            maxzoom: 20
+          },
+          'hybrid-tiles': {
+            type: 'raster',
+            tiles: [
               'https://mt0.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
               'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
               'https://mt2.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
               'https://mt3.google.com/vt/lyrs=y&x={x}&y={y}&z={z}'
+            ],
+            tileSize: 256,
+            maxzoom: 20
+          },
+          'street-tiles': {
+            type: 'raster',
+            tiles: [
+              'https://mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+              'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+              'https://mt2.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+              'https://mt3.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
             ],
             tileSize: 256,
             maxzoom: 20
@@ -45,9 +69,25 @@ class MapController {
             source: 'satellite-tiles',
             minzoom: 0,
             maxzoom: 22,
-            paint: {
-              'raster-opacity': 1.0
-            }
+            paint: { 'raster-opacity': 1.0 }
+          },
+          {
+            id: 'hybrid-layer',
+            type: 'raster',
+            source: 'hybrid-tiles',
+            minzoom: 0,
+            maxzoom: 22,
+            layout: { visibility: 'none' },
+            paint: { 'raster-opacity': 1.0 }
+          },
+          {
+            id: 'street-layer',
+            type: 'raster',
+            source: 'street-tiles',
+            minzoom: 0,
+            maxzoom: 22,
+            layout: { visibility: 'none' },
+            paint: { 'raster-opacity': 1.0 }
           }
         ]
       },
@@ -65,6 +105,7 @@ class MapController {
     this.map.on('load', () => {
       this.renderMarkers();
       this.updateHudTelemetry();
+      this.bindToolbarEvents();
     });
 
     this.map.on('move', () => this.updateHudTelemetry());
@@ -74,7 +115,81 @@ class MapController {
     return this.map;
   }
 
-  createSvgPin(title, type = 'branch') {
+  bindToolbarEvents() {
+    // 1. Layer switchers
+    const btnSat = document.getElementById('btn-layer-satellite');
+    const btnHyb = document.getElementById('btn-layer-hybrid');
+    const btnStr = document.getElementById('btn-layer-street');
+
+    const updateActiveLayerBtn = (activeBtn) => {
+      [btnSat, btnHyb, btnStr].forEach(b => { if (b) b.classList.remove('active'); });
+      if (activeBtn) activeBtn.classList.add('active');
+    };
+
+    if (btnSat) {
+      btnSat.addEventListener('click', () => {
+        this.switchMapLayer('satellite');
+        updateActiveLayerBtn(btnSat);
+      });
+    }
+
+    if (btnHyb) {
+      btnHyb.addEventListener('click', () => {
+        this.switchMapLayer('hybrid');
+        updateActiveLayerBtn(btnHyb);
+      });
+    }
+
+    if (btnStr) {
+      btnStr.addEventListener('click', () => {
+        this.switchMapLayer('street');
+        updateActiveLayerBtn(btnStr);
+      });
+    }
+
+    // 2. 3D Tilt Toggle
+    const btn3d = document.getElementById('btn-toggle-3d');
+    const label3d = document.getElementById('label-3d-toggle');
+    if (btn3d) {
+      btn3d.addEventListener('click', () => {
+        this.is3d = !this.is3d;
+        if (this.is3d) {
+          btn3d.classList.add('active');
+          if (label3d) label3d.textContent = '2D 탑뷰';
+          this.map.easeTo({ pitch: 58, bearing: 15, duration: 1200 });
+        } else {
+          btn3d.classList.remove('active');
+          if (label3d) label3d.textContent = '3D 틸트';
+          this.map.easeTo({ pitch: 0, bearing: 0, duration: 1200 });
+        }
+      });
+    }
+
+    // 3. Reset National Overview
+    const btnReset = document.getElementById('btn-reset-national');
+    if (btnReset) {
+      btnReset.addEventListener('click', () => {
+        this.flyToNationalOverview();
+      });
+    }
+  }
+
+  switchMapLayer(layerName) {
+    if (!this.map) return;
+    this.currentLayer = layerName;
+
+    const layers = ['satellite-layer', 'hybrid-layer', 'street-layer'];
+    layers.forEach(layerId => {
+      if (this.map.getLayer(layerId)) {
+        const isTarget = (layerName === 'satellite' && layerId === 'satellite-layer') ||
+                         (layerName === 'hybrid' && layerId === 'hybrid-layer') ||
+                         (layerName === 'street' && layerId === 'street-layer');
+        this.map.setLayoutProperty(layerId, 'visibility', isTarget ? 'visible' : 'none');
+      }
+    });
+  }
+
+  createSvgPin(title, type = 'branch', hasPulse = false) {
     // Colors configuration
     let bgLabel = '#082f49';
     let strokeLabel = '#38bdf8';
@@ -103,12 +218,16 @@ class MapController {
     svgWrap.style.cursor = 'pointer';
     svgWrap.style.pointerEvents = 'auto';
 
+    // Optional Radar Pulse Wave Ring
+    const pulseHtml = hasPulse ? '<div class="radar-pulse-ring"></div>' : '';
+
     // Mathematically aligned single SVG vector (Center X=48, Needle Tip=(48, 59))
     svgWrap.innerHTML = `
-      <svg width="96" height="62" viewBox="0 0 96 62" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.9));">
+      ${pulseHtml}
+      <svg width="96" height="62" viewBox="0 0 96 62" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.9)); position:relative; z-index:2;">
         <!-- 1. Top Badge Box (Center X=48) -->
-        <rect x="6" y="2" width="84" height="22" rx="4" fill="${bgLabel}" stroke="${strokeLabel}" stroke-width="1.5"/>
-        <text x="48" y="17" text-anchor="middle" fill="${textLabelColor}" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Pretendard', sans-serif" font-size="11.5" font-weight="800" letter-spacing="-0.2px">
+        <rect x="4" y="2" width="88" height="23" rx="4" fill="${bgLabel}" stroke="${strokeLabel}" stroke-width="1.5"/>
+        <text x="48" y="17.5" text-anchor="middle" fill="${textLabelColor}" font-family="-apple-system, BlinkMacSystemFont, 'Pretendard', sans-serif" font-size="11" font-weight="800" letter-spacing="-0.2px">
           ${iconSymbol} ${title}
         </text>
 
@@ -133,8 +252,9 @@ class MapController {
       const isHq = branch.is_hq === true;
       const type = isHq ? 'hq' : 'branch';
       const labelText = isHq ? '중앙사무국' : branch.short_name;
+      const isActive = branch.status === 'active';
 
-      const element = this.createSvgPin(labelText, type);
+      const element = this.createSvgPin(labelText, type, isActive);
       element.id = `marker-${branch.id}`;
 
       element.addEventListener('click', () => {
@@ -144,16 +264,16 @@ class MapController {
 
       const popup = new maplibregl.Popup({ offset: 32, closeButton: false })
         .setHTML(`
-          <div style="padding: 8px; font-family: -apple-system, sans-serif; min-width: 220px;">
-            <div style="font-size: 0.9rem; font-weight: 800; color: ${isHq ? '#fbbf24' : '#38bdf8'}; margin-bottom: 4px;">
-              ${isHq ? '🏛️ 중앙사무국 (본부)' : '🏛️ ' + branch.name}
+          <div style="padding: 6px 4px; font-family: -apple-system, 'Pretendard', sans-serif; min-width: 230px;">
+            <div style="font-size: 0.92rem; font-weight: 800; color: ${isHq ? '#fbbf24' : '#38bdf8'}; margin-bottom: 5px;">
+              ${isHq ? '👑 중앙사무국 (본부)' : '🏛️ ' + branch.name}
             </div>
-            <div style="font-size: 0.75rem; color: #cbd5e1; line-height: 1.4; margin-bottom: 4px;">📍 ${branch.address}</div>
-            <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px;">📞 ${branch.tel} / 👤 ${branch.manager}</div>
-            <div style="font-size: 0.72rem; font-weight: 700; color: ${isHq ? '#fbbf24' : (branch.status === 'active' ? '#34d399' : '#94a3b8')}; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 4px; margin-bottom: ${branch.dashboard_url && !isHq ? '6px' : '0'};">
-              ${isHq ? '👑 전국 9개 지부 총괄 기획 및 통합 관제 HQ' : (branch.status === 'active' ? `● 활성 사업: ${branch.active_projects_count}건 운영 중` : '○ 사업 연동 대기')}
+            <div style="font-size: 0.74rem; color: #cbd5e1; line-height: 1.45; margin-bottom: 4px;">📍 ${branch.address}</div>
+            <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px;">📞 ${branch.tel} / 👤 ${branch.manager || branch.leader}</div>
+            <div style="font-size: 0.73rem; font-weight: 700; color: ${isHq ? '#fbbf24' : (branch.status === 'active' ? '#34d399' : '#94a3b8')}; border-top: 1px dashed rgba(255,255,255,0.12); padding-top: 5px; margin-bottom: ${branch.dashboard_url && !isHq ? '6px' : '0'};">
+              ${isHq ? '👑 전국 9개 지부 총괄 기획 및 통합 관제 HQ' : (branch.status === 'active' ? `● 가동 사업: ${branch.active_projects_count}건 운영 중` : '○ 사업 연동 준비 중')}
             </div>
-            ${branch.dashboard_url && !isHq ? `<a href="${branch.dashboard_url}" target="_blank" style="display:block; text-align:center; font-size:0.75rem; font-weight:700; color:#fff; background:#0284c7; padding:4px 8px; border-radius:4px; text-decoration:none;">🚀 ${branch.short_name} 전용 관제 열기</a>` : ''}
+            ${branch.dashboard_url && !isHq ? `<a href="${branch.dashboard_url}" target="_blank" style="display:block; text-align:center; font-size:0.75rem; font-weight:700; color:#fff; background:#0284c7; padding:5px 8px; border-radius:4px; text-decoration:none; margin-top:4px;">🚀 ${branch.short_name} 전용 관제 열기</a>` : ''}
           </div>
         `);
 
@@ -175,7 +295,7 @@ class MapController {
       const isGeumgang = proj.id === 'proj-dcs-geumgang-01';
       const labelText = isGeumgang ? '천내리습지' : '두웅습지';
 
-      const element = this.createSvgPin(labelText, 'project');
+      const element = this.createSvgPin(labelText, 'project', true);
       element.id = `marker-${proj.id}`;
 
       element.addEventListener('click', () => {
@@ -185,12 +305,12 @@ class MapController {
 
       const popup = new maplibregl.Popup({ offset: 32, closeButton: false })
         .setHTML(`
-          <div style="padding: 8px; font-family: -apple-system, sans-serif; min-width: 220px;">
-            <div style="font-size: 0.88rem; font-weight: 800; color: #34d399; margin-bottom: 3px;">🌿 ${proj.title}</div>
-            <div style="font-size: 0.74rem; color: #94a3b8; margin-bottom: 3px;">발주: ${proj.client}</div>
+          <div style="padding: 6px 4px; font-family: -apple-system, 'Pretendard', sans-serif; min-width: 230px;">
+            <div style="font-size: 0.9rem; font-weight: 800; color: #34d399; margin-bottom: 4px;">🌿 ${proj.title}</div>
+            <div style="font-size: 0.74rem; color: #94a3b8; margin-bottom: 3px;">발주처: ${proj.client}</div>
             <div style="font-size: 0.74rem; color: #cbd5e1; margin-bottom: 4px;">위치: ${proj.location_name}</div>
-            <div style="font-size: 0.75rem; font-weight: 700; color: #38bdf8; margin-bottom: 6px;">실적: ${(Number(proj.total_area_m2)).toLocaleString()}㎡ (${proj.total_harvest_kg}kg 수거)</div>
-            ${proj.live_dashboard_url ? `<a href="${proj.live_dashboard_url}" target="_blank" style="display:block; text-align:center; font-size:0.75rem; font-weight:700; color:#fff; background:#0284c7; padding:4px 8px; border-radius:4px; text-decoration:none;">🚀 지부 드론 관제시스템 열기</a>` : ''}
+            <div style="font-size: 0.75rem; font-weight: 700; color: #38bdf8; margin-bottom: 6px;">실적: ${(Number(proj.total_area_m2)).toLocaleString()}㎡ (${(proj.total_harvest_kg).toLocaleString()}kg 수거)</div>
+            ${proj.live_dashboard_url ? `<a href="${proj.live_dashboard_url}" target="_blank" style="display:block; text-align:center; font-size:0.75rem; font-weight:700; color:#fff; background:#0284c7; padding:5px 8px; border-radius:4px; text-decoration:none;">🚀 지부 3D 드론 관제 열기</a>` : ''}
           </div>
         `);
 
@@ -215,7 +335,7 @@ class MapController {
     this.map.flyTo({
       center: [branch.lng, branch.lat],
       zoom: branch.zoom || 15.5,
-      pitch: 0,
+      pitch: this.is3d ? 50 : 0,
       bearing: 0,
       duration: 1800,
       essential: true
@@ -229,7 +349,7 @@ class MapController {
     this.map.flyTo({
       center: [proj.lng, proj.lat],
       zoom: proj.zoom || 16.2,
-      pitch: 0,
+      pitch: this.is3d ? 55 : 0,
       bearing: 0,
       duration: 1800,
       essential: true
@@ -240,7 +360,7 @@ class MapController {
     this.map.flyTo({
       center: [127.5000, 36.3000],
       zoom: 7.3,
-      pitch: 0,
+      pitch: this.is3d ? 45 : 0,
       bearing: 0,
       duration: 1800,
       essential: true
@@ -274,3 +394,4 @@ class MapController {
 }
 
 window.MapController = MapController;
+
