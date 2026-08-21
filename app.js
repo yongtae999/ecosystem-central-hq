@@ -64,6 +64,45 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
     }
   });
+
+  // 9. Real-time Cloud Sync Live Event Listener
+  window.addEventListener('wma_data_synced', (e) => {
+    console.log('🔄 [App] Real-time cloud sync update received. Refreshing UI...');
+    adminModal.refreshAllUI();
+
+    const detail = e.detail || {};
+    if (detail.newProject) {
+      adminModal.showToast(`🔔 [${detail.newProject.branch_name}]에서 '${detail.newProject.title}' 사업을 실시간 신규 등록하였습니다.`);
+    } else if (detail.newActivity) {
+      adminModal.showToast(`🔔 [${detail.newActivity.branch_name}]에서 '${detail.newActivity.project_title}' 작업일지를 실시간 등록하였습니다.`);
+    }
+  });
+
+  // 10. Live Cloud Connection Status Monitor
+  if (window.cloudSync) {
+    const statusPill = document.getElementById('header-live-sync-pill');
+    const statusDot = statusPill ? statusPill.querySelector('.live-dot') : null;
+    const statusText = statusPill ? statusPill.querySelector('.sync-text') : null;
+
+    window.cloudSync.onStatusChange((status) => {
+      if (!statusPill) return;
+      if (status === 'connected') {
+        statusPill.className = 'live-status-pill connected';
+        if (statusDot) statusDot.className = 'live-dot active';
+        if (statusText) statusText.textContent = '전국 실시간 관제망 연동';
+        statusPill.title = '전국 9개 지부 및 중앙사무국 실시간 클라우드 DB 연동 중 (WebSockets Active)';
+      } else if (status === 'connecting') {
+        statusPill.className = 'live-status-pill connecting';
+        if (statusDot) statusDot.className = 'live-dot connecting';
+        if (statusText) statusText.textContent = '관제망 동기화 중...';
+      } else {
+        statusPill.className = 'live-status-pill offline';
+        if (statusDot) statusDot.className = 'live-dot standby';
+        if (statusText) statusText.textContent = '전국 관제망 동기화 작동';
+        statusPill.title = '전국 관제망 자동 동기화 채널 가동 중';
+      }
+    });
+  }
 });
 
 /**

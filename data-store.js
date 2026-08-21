@@ -64,6 +64,16 @@ class DataStore {
       this.saveActivities();
 
       this.recalculateBranchStats();
+
+      // 4. Initialize Cloud Real-time Synchronization
+      if (window.cloudSync) {
+        window.cloudSync.init().then(() => {
+          window.cloudSync.subscribeToCloudData((remoteData) => {
+            this.handleRemoteCloudSync(remoteData);
+          });
+        });
+      }
+
       return {
         branches: this.branches,
         projects: this.projects,
@@ -72,6 +82,66 @@ class DataStore {
     } catch (err) {
       console.error('DataStore load error:', err);
       return { branches: [], projects: [], activities: [] };
+    }
+  }
+
+  /**
+   * Merge incoming real-time data from Cloud DB or BroadcastChannel
+   */
+  handleRemoteCloudSync(remoteData) {
+    let hasChanges = false;
+
+    if (remoteData.projects && Array.isArray(remoteData.projects)) {
+      remoteData.projects.forEach(rp => {
+        const idx = this.projects.findIndex(p => p.id === rp.id);
+        if (idx >= 0) {
+          // Update existing
+          this.projects[idx] = Object.assign({}, this.projects[idx], rp);
+          hasChanges = true;
+        } else {
+          // Insert new remote project
+          this.projects.unshift(rp);
+          hasChanges = true;
+        }
+      });
+    }
+
+    if (remoteData.activities && Array.isArray(remoteData.activities)) {
+      remoteData.activities.forEach(ra => {
+        const idx = this.activities.findIndex(a => a.id === ra.id);
+        if (idx >= 0) {
+          this.activities[idx] = Object.assign({}, this.activities[idx], ra);
+          hasChanges = true;
+        } else {
+          this.activities.unshift(ra);
+          hasChanges = true;
+        }
+      });
+    }
+
+    if (remoteData.newProject) {
+      const np = remoteData.newProject;
+      if (!this.projects.some(p => p.id === np.id)) {
+        this.projects.unshift(np);
+        hasChanges = true;
+      }
+    }
+
+    if (remoteData.newActivity) {
+      const na = remoteData.newActivity;
+      if (!this.activities.some(a => a.id === na.id)) {
+        this.activities.unshift(na);
+        hasChanges = true;
+      }
+    }
+
+    if (hasChanges) {
+      this.recalculateBranchStats();
+      localStorage.setItem(this.STORAGE_KEY_PROJECTS, JSON.stringify(this.projects));
+      localStorage.setItem(this.STORAGE_KEY_ACTIVITIES, JSON.stringify(this.activities));
+      
+      // Dispatch global event for UI refreshes across the whole app
+      window.dispatchEvent(new CustomEvent('wma_data_synced', { detail: remoteData }));
     }
   }
 
@@ -112,6 +182,12 @@ class DataStore {
     newProj.id = `proj-${newProj.branch_id}-${Date.now()}`;
     this.projects.unshift(newProj);
     this.saveProjects();
+
+    // Stream to Cloud DB & other branches
+    if (window.cloudSync) {
+      window.cloudSync.syncProject(newProj);
+    }
+
     return newProj;
   }
 
@@ -128,6 +204,12 @@ class DataStore {
     }
 
     this.saveActivities();
+
+    // Stream to Cloud DB & other branches
+    if (window.cloudSync) {
+      window.cloudSync.syncActivity(newAct);
+    }
+
     return newAct;
   }
 

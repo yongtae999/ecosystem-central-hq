@@ -132,10 +132,30 @@ body {
   color: #34d399;
   font-size: 0.68rem;
   font-weight: 700;
-  padding: 3px 8px;
+  padding: 3px 10px;
   border-radius: 999px;
   letter-spacing: -0.2px;
   margin-left: 6px;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.live-status-pill.connected {
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+
+.live-status-pill.connecting {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+}
+
+.live-status-pill.offline {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
 }
 
 .live-dot {
@@ -145,6 +165,21 @@ body {
   background: #10b981;
   box-shadow: 0 0 8px #10b981;
   animation: live-dot-pulse 1.8s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.live-dot.active {
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.live-dot.connecting {
+  background: #fbbf24;
+  box-shadow: 0 0 8px #fbbf24;
+}
+
+.live-dot.standby {
+  background: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
 }
 
 @keyframes live-dot-pulse {

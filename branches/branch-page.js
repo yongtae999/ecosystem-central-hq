@@ -43,6 +43,16 @@ class BranchMonitorApp {
       this.renderBranchInfo();
       this.renderProjectsList();
       this.initMap();
+
+      // Subscribe to real-time updates from other branches & HQ
+      if (typeof BroadcastChannel !== 'undefined' && !this.bcSubscribed) {
+        this.bcSubscribed = true;
+        const bc = new BroadcastChannel('wma_ecosystem_national_channel');
+        bc.onmessage = () => {
+          console.log(`📡 [BranchMonitor] Real-time sync update received for branch: ${this.branchId}`);
+          this.init();
+        };
+      }
     } catch (err) {
       console.error("Error loading branch app:", err);
     }

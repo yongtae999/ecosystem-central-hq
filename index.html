@@ -21,8 +21,12 @@
   <!-- Chart.js 4.4 CDN for HQ Real-time Analytics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+  <!-- Firebase 10.8 App & Realtime Database SDK (Nationwide Real-time Cloud Sync) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
   <!-- Main Tactical Theme CSS -->
-  <link rel="stylesheet" href="styles.css?v=20260821_1355">
+  <link rel="stylesheet" href="styles.css?v=20260821_1515">
 </head>
 <body class="theme-tactical">
 
@@ -39,9 +43,9 @@
           (사)야생생물관리협회 · 전국 9개 시·도 지부 드론 GIS 통합 모니터링 시스템
         </div>
       </div>
-      <div class="live-status-pill">
-        <span class="live-dot"></span>
-        <span>관제망 정상 가동</span>
+      <div class="live-status-pill connected" id="header-live-sync-pill" title="전국 9개 지부 및 중앙사무국 실시간 클라우드 DB 연동 중 (WebSockets Active)">
+        <span class="live-dot active"></span>
+        <span class="sync-text">전국 실시간 관제망 연동</span>
       </div>
     </div>
 
@@ -522,11 +526,12 @@
   </div>
 
   <!-- App Modules -->
-  <script src="data-store.js?v=20260821_1355"></script>
-  <script src="map-controller.js?v=20260821_1355"></script>
-  <script src="branch-manager.js?v=20260821_1355"></script>
-  <script src="analytics.js?v=20260821_1355"></script>
-  <script src="admin-modal.js?v=20260821_1355"></script>
-  <script src="app.js?v=20260821_1355"></script>
+  <script src="cloud-sync.js?v=20260821_1515"></script>
+  <script src="data-store.js?v=20260821_1515"></script>
+  <script src="map-controller.js?v=20260821_1515"></script>
+  <script src="branch-manager.js?v=20260821_1515"></script>
+  <script src="analytics.js?v=20260821_1515"></script>
+  <script src="admin-modal.js?v=20260821_1515"></script>
+  <script src="app.js?v=20260821_1515"></script>
 </body>
 </html>
