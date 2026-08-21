@@ -292,11 +292,13 @@ class AdminModalManager {
     const modal = document.getElementById('modal-new-project');
     if (!modal) return;
 
-    // Populate Branch Options
+    // Populate Branch Options (Exclude HQ)
     const branchSelect = document.getElementById('proj-branch-select');
     if (branchSelect) {
-      branchSelect.innerHTML = this.ds.branches.map(b => `
-        <option value="${b.id}">${b.name}</option>
+      const nonHqBranches = this.ds.branches.filter(b => !b.is_hq);
+      const curBranch = this.branchMgr.activeBranchId !== 'all' ? this.branchMgr.activeBranchId : 'jeonbuk';
+      branchSelect.innerHTML = nonHqBranches.map(b => `
+        <option value="${b.id}" ${b.id === curBranch ? 'selected' : ''}>${b.name}</option>
       `).join('');
     }
 
@@ -434,7 +436,8 @@ class AdminModalManager {
     this.refreshAllUI();
     this.closeAllModals();
 
-    // Fly to new project
+    // Automatically switch branch filter to new project's branch
+    this.branchMgr.setBranchFilter(newProject.branch_id);
     this.mapCtrl.flyToProject(newProject.id);
     this.showToast(`🎉 [${newProject.title}] 사업이 성공적으로 등록되었습니다!`);
   }

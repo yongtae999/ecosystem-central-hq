@@ -59,9 +59,19 @@ class BranchManager {
     const container = document.getElementById('branch-cards-container');
     if (!container) return;
 
-    container.innerHTML = '';
+    const nonHqBranches = this.branches.filter(b => !b.is_hq);
+    const activeCount = nonHqBranches.filter(b => b.status === 'active').length;
+    const standbyCount = nonHqBranches.filter(b => b.status !== 'active').length;
 
-    let list = this.branches.filter(b => !b.is_hq);
+    // Dynamically update tab badges
+    const tabAll = document.querySelector('#branch-filter-tabs .branch-filter-tab[data-filter="all"]');
+    const tabActive = document.querySelector('#branch-filter-tabs .branch-filter-tab[data-filter="active"]');
+    const tabStandby = document.querySelector('#branch-filter-tabs .branch-filter-tab[data-filter="standby"]');
+    if (tabAll) tabAll.textContent = `전체 (${nonHqBranches.length})`;
+    if (tabActive) tabActive.innerHTML = `<span class="tab-dot active"></span> 가동 중 (${activeCount})`;
+    if (tabStandby) tabStandby.innerHTML = `<span class="tab-dot standby"></span> 대기 (${standbyCount})`;
+
+    let list = nonHqBranches;
 
     if (this.stateFilter === 'active') {
       list = list.filter(b => b.status === 'active');

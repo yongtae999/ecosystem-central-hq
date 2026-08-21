@@ -304,10 +304,21 @@ class MapController {
       this.markers.push(marker);
     });
 
-    // 2. Render Project Pinpoints (Cheonnaeri, Doowoong)
+    // 2. Render Project Pinpoints (Cheonnaeri, Doowoong, Jeonbuk & other registered projects)
     this.projects.forEach(proj => {
-      const isGeumgang = proj.id === 'proj-dcs-geumgang-01';
-      const labelText = isGeumgang ? '천내리습지' : '두웅습지';
+      let labelText = proj.title || '사업지';
+      if (proj.id === 'proj-dcs-geumgang-01') {
+        labelText = '천내리습지';
+      } else if (proj.id === 'proj-dcs-doowoong-02') {
+        labelText = '두웅습지';
+      } else if (proj.location_name) {
+        const cleanLoc = proj.location_name.replace(/^(충청남도|전북특별자치도|전라북도|경기도|강원도|경상남도|경상북도|전라남도|제주특별자치도|서울특별시|인천광역시|대전광역시|광주광역시|대구광역시|부산광역시|울산광역시|세종특별자치시)\s*/, '');
+        const words = cleanLoc.split(/\s+/);
+        labelText = words.slice(0, 2).join(' ') || proj.title;
+      }
+      if (labelText.length > 8) {
+        labelText = labelText.slice(0, 7) + '..';
+      }
 
       const element = this.createSvgPin(labelText, 'project', true);
       element.id = `marker-${proj.id}`;
