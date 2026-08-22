@@ -104,7 +104,7 @@ class CloudSyncManager {
         this.broadcastChannel.onmessage = (event) => {
           const { type, payload, sender } = event.data || {};
           console.log(`📡 [BroadcastChannel] Received sync message: ${type} from ${sender}`);
-          if (type === 'SYNC_ALL' || type === 'PROJECT_ADDED' || type === 'ACTIVITY_ADDED') {
+          if (type === 'SYNC_ALL' || type === 'PROJECT_ADDED' || type === 'PROJECT_UPDATED' || type === 'PROJECT_DELETED' || type === 'ACTIVITY_ADDED') {
             this.triggerRemoteDataChange(payload);
           }
         };
@@ -178,6 +178,62 @@ class CloudSyncManager {
           type: 'PROJECT_ADDED',
           sender: project.branch_name || '지부',
           payload: { newProject: project }
+        });
+      } catch (e) {}
+    }
+  }
+
+  /**
+   * Push an updated project to the Nationwide Cloud Database
+   */
+  async syncProjectUpdate(project) {
+    this.lastSyncTime = new Date();
+
+    // 1. Send via Firebase Realtime DB
+    if (this.db && this.isConnected) {
+      try {
+        await this.db.ref(`ecosystem_projects/${project.id}`).set(project);
+        console.log(`☁️ [CloudSync] Project [${project.title}] update synced to Cloud DB.`);
+      } catch (err) {
+        console.warn('[CloudSync] Firebase project update sync error:', err);
+      }
+    }
+
+    // 2. Broadcast immediately to other tabs/windows
+    if (this.broadcastChannel) {
+      try {
+        this.broadcastChannel.postMessage({
+          type: 'PROJECT_UPDATED',
+          sender: project.branch_name || '지부',
+          payload: { updatedProject: project }
+        });
+      } catch (e) {}
+    }
+  }
+
+  /**
+   * Push project deletion to the Nationwide Cloud Database
+   */
+  async syncProjectDelete(projectId) {
+    this.lastSyncTime = new Date();
+
+    // 1. Delete in Firebase Realtime DB
+    if (this.db && this.isConnected) {
+      try {
+        await this.db.ref(`ecosystem_projects/${projectId}`).remove();
+        console.log(`☁️ [CloudSync] Project [${projectId}] deletion synced to Cloud DB.`);
+      } catch (err) {
+        console.warn('[CloudSync] Firebase project deletion sync error:', err);
+      }
+    }
+
+    // 2. Broadcast immediately to other tabs/windows
+    if (this.broadcastChannel) {
+      try {
+        this.broadcastChannel.postMessage({
+          type: 'PROJECT_DELETED',
+          sender: 'HQ_CENTRAL',
+          payload: { deletedProjectId: projectId }
         });
       } catch (e) {}
     }

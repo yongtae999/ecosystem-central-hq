@@ -103,7 +103,96 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
   }
+
+  // 11. Initialize Mobile Bottom Tab Navigation & Quick Sheet
+  setupMobileNavigation(adminModal, mapCtrl, window.dataStore);
 });
+
+/**
+ * Mobile Tab Navigation & Quick Action Sheet Orchestrator
+ */
+function setupMobileNavigation(adminModal, mapCtrl, dataStore) {
+  const tabs = document.querySelectorAll('.mobile-bottom-nav .mobile-nav-item:not(.quick-action)');
+  const mainLayout = document.querySelector('.main-layout');
+
+  // Default active view on mobile: map
+  if (mainLayout) {
+    mainLayout.classList.add('mobile-view-map');
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.target; // 'map' | 'branches' | 'analytics'
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      if (mainLayout) {
+        mainLayout.classList.remove('mobile-view-map', 'mobile-view-branches', 'mobile-view-analytics');
+        mainLayout.classList.add(`mobile-view-${target}`);
+      }
+
+      if (target === 'map' && mapCtrl && mapCtrl.map) {
+        setTimeout(() => {
+          mapCtrl.map.resize();
+        }, 100);
+      }
+    });
+  });
+
+  // Quick Action Sheet Toggle
+  const btnQuick = document.getElementById('mobile-btn-quick-new');
+  const quickSheet = document.getElementById('mobile-quick-sheet');
+  const sheetClose = document.getElementById('mobile-quick-sheet-close');
+  const sheetBackdrop = document.getElementById('mobile-quick-sheet-backdrop');
+
+  const closeQuickSheet = () => {
+    if (quickSheet) quickSheet.classList.remove('active');
+  };
+
+  if (btnQuick && quickSheet) {
+    btnQuick.addEventListener('click', () => {
+      quickSheet.classList.toggle('active');
+    });
+  }
+
+  if (sheetClose) sheetClose.addEventListener('click', closeQuickSheet);
+  if (sheetBackdrop) sheetBackdrop.addEventListener('click', closeQuickSheet);
+
+  // Quick Actions
+  const btnAddProj = document.getElementById('mobile-action-add-project');
+  if (btnAddProj) {
+    btnAddProj.addEventListener('click', () => {
+      closeQuickSheet();
+      adminModal.openNewProjectModal();
+    });
+  }
+
+  const btnAddAct = document.getElementById('mobile-action-add-activity');
+  if (btnAddAct) {
+    btnAddAct.addEventListener('click', () => {
+      closeQuickSheet();
+      adminModal.openActivityModal();
+    });
+  }
+
+  const btnRollover = document.getElementById('mobile-action-open-rollover');
+  if (btnRollover) {
+    btnRollover.addEventListener('click', () => {
+      closeQuickSheet();
+      const modal = document.getElementById('modal-year-rollover');
+      if (modal) modal.classList.add('active');
+    });
+  }
+
+  const btnExport = document.getElementById('mobile-action-export-json');
+  if (btnExport) {
+    btnExport.addEventListener('click', () => {
+      closeQuickSheet();
+      dataStore.exportDataJson('2026');
+      adminModal.showToast('✅ 전체 사업 및 일지 데이터가 JSON 백업 파일로 다운로드되었습니다.');
+    });
+  }
+}
 
 /**
  * Real-time KST Clock Ticker (UTC+9)

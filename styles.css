@@ -1468,31 +1468,427 @@ body {
 /* ===================================================================
    8. RESPONSIVE QUERIES
    =================================================================== */
-@media (max-width: 1200px) {
+/* ===================================================================
+   8. MOBILE BOTTOM NAVIGATION & QUICK ACTION SHEET
+   =================================================================== */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: rgba(12, 18, 29, 0.96);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  padding: 0 8px;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.mobile-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 48px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  position: relative;
+  touch-action: manipulation;
+}
+
+.mobile-nav-item i {
+  font-size: 1.15rem;
+  transition: transform 0.2s ease;
+}
+
+.mobile-nav-item:hover {
+  color: #fff;
+}
+
+.mobile-nav-item.active {
+  color: var(--accent-cyan);
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.mobile-nav-item.active i {
+  transform: scale(1.1);
+  color: var(--accent-cyan);
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.6));
+}
+
+.mobile-nav-item.quick-action {
+  background: linear-gradient(135deg, #0284c7, #10b981);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+}
+
+.mobile-nav-item.quick-action:active {
+  transform: scale(0.96);
+}
+
+/* Mobile Quick Action Sheet */
+.mobile-quick-sheet {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10001;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-quick-sheet.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mobile-quick-sheet-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(3, 7, 18, 0.75);
+  backdrop-filter: blur(6px);
+}
+
+.mobile-quick-sheet-content {
+  position: absolute;
+  bottom: 60px;
+  left: 0;
+  right: 0;
+  background: #0f172a;
+  border-top: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 18px 18px 0 0;
+  padding: 18px 20px;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.8);
+  transform: translateY(100%);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+}
+
+.mobile-quick-sheet.active .mobile-quick-sheet-content {
+  transform: translateY(0);
+}
+
+.quick-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.quick-sheet-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.6rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.quick-sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.quick-sheet-actions .btn-tactical {
+  width: 100%;
+  min-height: 46px;
+  justify-content: center;
+  font-size: 0.88rem;
+}
+
+/* ===================================================================
+   9. RESPONSIVE QUERIES (DESKTOP, TABLET & MOBILE)
+   =================================================================== */
+
+/* Tablet & Smaller Desktop */
+@media (max-width: 1280px) {
+  :root {
+    --sidebar-width: 320px;
+  }
+  .brand-title {
+    font-size: 0.92rem;
+  }
+  .brand-subtitle {
+    font-size: 0.68rem;
+  }
+}
+
+/* 2-Column Mode on Middle Screens */
+@media (max-width: 1024px) {
   .sidebar.right-sidebar {
     display: none;
   }
 }
 
-@media (max-width: 768px) {
+/* Mobile Devices (<= 900px) */
+@media (max-width: 900px) {
   body {
-    overflow-y: auto;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
   }
+
+  .app-header {
+    height: 54px;
+    padding: 0 12px;
+  }
+
+  .brand-logo {
+    height: 32px;
+  }
+
+  .brand-title {
+    font-size: 0.85rem;
+    gap: 4px;
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
+  .live-status-pill {
+    padding: 2px 7px;
+    font-size: 0.62rem;
+    margin-left: 2px;
+  }
+  .live-status-pill .sync-text {
+    display: none;
+  }
+
+  .live-clock-pill {
+    display: none;
+  }
+
+  .branch-select-wrap {
+    padding: 3px 6px;
+    max-width: 130px;
+  }
+  .branch-select-wrap i {
+    font-size: 0.75rem;
+  }
+  .branch-dropdown {
+    font-size: 0.75rem;
+    max-width: 105px;
+    text-overflow: ellipsis;
+  }
+
+  /* Hide bulky header buttons on mobile since they exist in mobile tab bar & quick sheet */
+  #year-dropdown-select,
+  #btn-open-new-project-modal,
+  #btn-open-activity-modal,
+  #btn-open-rollover-modal,
+  #btn-export-json,
+  #btn-fullscreen {
+    display: none;
+  }
+
+  /* Show Mobile Navigation Bar */
+  .mobile-bottom-nav {
+    display: flex;
+  }
+
+  /* Main Layout Switcher */
   .main-layout {
-    flex-direction: column;
-    height: auto;
+    height: calc(100vh - 54px - 60px);
+    position: relative;
+    overflow: hidden;
   }
+
   .sidebar {
     width: 100%;
-    height: 400px;
+    height: 100%;
+    border-right: none;
+    border-left: none;
+    display: none;
   }
-  .center-stage, .map-container {
-    height: 450px;
+
+  .sidebar.right-sidebar {
+    display: none;
   }
+
+  .center-stage {
+    width: 100%;
+    height: 100%;
+    display: none;
+  }
+
+  /* Mobile Active View Rules */
+  .main-layout.mobile-view-map .center-stage {
+    display: flex;
+  }
+
+  .main-layout.mobile-view-branches .left-sidebar {
+    display: flex;
+  }
+
+  .main-layout.mobile-view-analytics .right-sidebar {
+    display: flex;
+  }
+
+  /* Map Controls on Mobile */
+  .map-floating-toolbar {
+    bottom: 12px;
+    padding: 3px 5px;
+    gap: 4px;
+  }
+
+  .map-tool-btn {
+    padding: 4px 6px;
+    font-size: 0.68rem;
+  }
+
+  .map-hud-overlay {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+  }
+
+  .hud-pill {
+    font-size: 0.68rem;
+    padding: 3px 6px;
+  }
+
+  .telemetry-wing {
+    padding: 4px 8px;
+    font-size: 0.65rem;
+  }
+
+  /* Responsive Modals */
+  .modal-card {
+    width: 95%;
+    max-width: 95vw;
+    max-height: 86vh;
+    padding: 16px 14px;
+    border-radius: 12px;
+  }
+
+  .modal-header {
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+  }
+
+  .modal-title {
+    font-size: 0.92rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-input {
+    font-size: 16px; /* Prevents auto-zoom on iOS */
+    padding: 10px 12px;
+    min-height: 42px;
+  }
+
   .species-checkbox-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
   }
+
+  .species-checkbox-grid label {
+    font-size: 0.72rem;
+    padding: 6px 8px;
+  }
+
   .photo-preview-grid {
     grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+
+  .modal-actions .btn-tactical {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+    font-size: 0.85rem;
+  }
+
+  #btn-delete-project-modal {
+    margin-right: 0 !important;
+    margin-bottom: 4px;
+  }
+
+  /* Project Card Touch Targets */
+  .project-card {
+    padding: 12px;
+  }
+
+  .project-btn-row {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .project-btn-row .btn-tactical,
+  .project-btn-row .btn-open-branch-app {
+    min-height: 36px;
+  }
+
+  /* KPIs on Mobile */
+  .kpi-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .kpi-box {
+    padding: 8px 10px;
+  }
+
+  .kpi-val {
+    font-size: 1.05rem;
   }
 }
+
+/* Extra Small Phones (<= 480px) */
+@media (max-width: 480px) {
+  .brand-title {
+    font-size: 0.8rem;
+  }
+  .hq-badge {
+    display: none;
+  }
+  .branch-select-wrap {
+    max-width: 115px;
+  }
+  .branch-dropdown {
+    max-width: 90px;
+    font-size: 0.7rem;
+  }
+  .species-checkbox-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

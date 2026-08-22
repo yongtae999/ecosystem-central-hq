@@ -26,7 +26,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
   <!-- Main Tactical Theme CSS -->
-  <link rel="stylesheet" href="styles.css?v=20260821_1515">
+  <link rel="stylesheet" href="styles.css?v=20260822_0958">
 </head>
 <body class="theme-tactical">
 
@@ -275,13 +275,60 @@
   </main>
 
   <!-- ===================================================================
-       MODAL 1: NEW PROJECT WIZARD
+       MOBILE BOTTOM NAVIGATION TAB BAR (스마트폰 원터치 뷰 전환 네비게이션)
+       =================================================================== -->
+  <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+    <button class="mobile-nav-item active" data-target="map" id="mobile-tab-map">
+      <i class="fa-solid fa-earth-asia"></i>
+      <span>지도 관제</span>
+    </button>
+    <button class="mobile-nav-item" data-target="branches" id="mobile-tab-branches">
+      <i class="fa-solid fa-building-flag"></i>
+      <span>지부·사업</span>
+    </button>
+    <button class="mobile-nav-item" data-target="analytics" id="mobile-tab-analytics">
+      <i class="fa-solid fa-chart-line"></i>
+      <span>실적·일지</span>
+    </button>
+    <button class="mobile-nav-item quick-action" id="mobile-btn-quick-new" title="신규 등록 선택">
+      <i class="fa-solid fa-plus-circle"></i>
+      <span>빠른 등록</span>
+    </button>
+  </nav>
+
+  <!-- Mobile Quick Action Sheet -->
+  <div class="mobile-quick-sheet" id="mobile-quick-sheet">
+    <div class="mobile-quick-sheet-backdrop" id="mobile-quick-sheet-backdrop"></div>
+    <div class="mobile-quick-sheet-content">
+      <div class="quick-sheet-header">
+        <span>⚡ 빠른 현장 업무 등록</span>
+        <button type="button" class="quick-sheet-close" id="mobile-quick-sheet-close">&times;</button>
+      </div>
+      <div class="quick-sheet-actions">
+        <button type="button" id="mobile-action-add-project" class="btn-tactical accent">
+          <i class="fa-solid fa-seedling"></i> 신규 제거사업 개설
+        </button>
+        <button type="button" id="mobile-action-add-activity" class="btn-tactical emerald">
+          <i class="fa-solid fa-file-pen"></i> 현장 작업일지 등록
+        </button>
+        <button type="button" id="mobile-action-open-rollover" class="btn-tactical secondary">
+          <i class="fa-solid fa-clock-rotate-left"></i> 연도 마감 및 시즌 초기화
+        </button>
+        <button type="button" id="mobile-action-export-json" class="btn-tactical secondary">
+          <i class="fa-solid fa-download"></i> 전체 데이터 JSON 백업
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 1: NEW / EDIT PROJECT WIZARD
        =================================================================== -->
   <div class="modal-overlay" id="modal-new-project">
     <div class="modal-backdrop"></div>
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title">
+        <div class="modal-title" id="modal-project-title-text">
           <i class="fa-solid fa-seedling text-cyan"></i> 신규 생태계교란생물 제거사업 등록
         </div>
         <button class="modal-close-btn">&times;</button>
@@ -378,8 +425,11 @@
         </div>
 
         <div class="modal-actions">
+          <button type="button" id="btn-delete-project-modal" class="btn-tactical danger" style="display: none; margin-right: auto;">
+            <i class="fa-solid fa-trash-can"></i> 사업 삭제
+          </button>
           <button type="button" class="btn-tactical secondary modal-close-btn">취소</button>
-          <button type="submit" class="btn-tactical primary">
+          <button type="submit" id="btn-submit-project" class="btn-tactical primary">
             <i class="fa-solid fa-check"></i> 신규 사업 개설 완료
           </button>
         </div>
@@ -578,12 +628,12 @@
   </div>
 
   <!-- App Modules -->
-  <script src="cloud-sync.js?v=20260821_1515"></script>
-  <script src="data-store.js?v=20260821_1515"></script>
-  <script src="map-controller.js?v=20260821_1515"></script>
-  <script src="branch-manager.js?v=20260821_1515"></script>
-  <script src="analytics.js?v=20260821_1515"></script>
-  <script src="admin-modal.js?v=20260821_1515"></script>
-  <script src="app.js?v=20260821_1515"></script>
+  <script src="cloud-sync.js?v=20260822_0958"></script>
+  <script src="data-store.js?v=20260822_0958"></script>
+  <script src="map-controller.js?v=20260822_0958"></script>
+  <script src="branch-manager.js?v=20260822_0958"></script>
+  <script src="analytics.js?v=20260822_0958"></script>
+  <script src="admin-modal.js?v=20260822_0958"></script>
+  <script src="app.js?v=20260822_0958"></script>
 </body>
 </html>

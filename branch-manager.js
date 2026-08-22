@@ -186,16 +186,22 @@ class BranchManager {
           📊 실적: <b>${(proj.total_area_m2).toLocaleString()}㎡</b> (${(proj.total_harvest_kg).toLocaleString()}kg 수거) ${proj.drone_flights ? `· 드론 ${proj.drone_flights}회` : ''}
         </div>
         <div class="project-btn-row">
-          <button class="btn-tactical secondary" style="flex: 1; padding: 4px;" onclick="window.mapCtrl.flyToProject('${proj.id}')">
-            <i class="fa-solid fa-crosshairs"></i> 위치 줌
+          <button type="button" class="btn-tactical secondary" style="flex: 1; padding: 5px 6px; font-size: 0.72rem;" onclick="window.mapCtrl.flyToProject('${proj.id}')" title="해당 사업지 맵 위치로 이동">
+            <i class="fa-solid fa-crosshairs"></i> 위치
+          </button>
+          <button type="button" class="btn-tactical secondary" style="flex: 1; padding: 5px 6px; font-size: 0.72rem; color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);" onclick="window.adminModal.openEditProjectModal('${proj.id}')" title="사업 정보 수정">
+            <i class="fa-solid fa-pen-to-square"></i> 수정
+          </button>
+          <button type="button" class="btn-tactical secondary" style="padding: 5px 8px; font-size: 0.72rem; color: #f87171; border-color: rgba(239, 68, 68, 0.4);" onclick="window.adminModal.handleDeleteProject('${proj.id}')" title="사업 삭제">
+            <i class="fa-solid fa-trash-can"></i>
           </button>
           ${proj.live_dashboard_url ? `
-            <a href="${proj.live_dashboard_url}" target="_blank" class="btn-open-branch-app" title="해당 지부 전용 3D 드론 정사영상 관제 웹사이트로 이동">
+            <a href="${proj.live_dashboard_url}" target="_blank" class="btn-open-branch-app" style="flex: 1.2; padding: 5px 6px;" title="해당 지부 전용 3D 드론 정사영상 관제 웹사이트로 이동">
               <i class="fa-solid fa-plane-up"></i> 드론 관제
             </a>
           ` : `
-            <button class="btn-tactical" style="flex: 1; padding: 4px; opacity: 0.6; cursor: default;" title="해당 사업 관제 시스템 준비 중">
-              <i class="fa-solid fa-clock"></i> 관제 준비 중
+            <button type="button" class="btn-tactical" style="flex: 1.2; padding: 5px 6px; opacity: 0.55; cursor: default; font-size: 0.7rem;" title="해당 사업 관제 시스템 준비 중">
+              <i class="fa-solid fa-clock"></i> 대기
             </button>
           `}
         </div>

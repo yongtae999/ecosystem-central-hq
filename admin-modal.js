@@ -11,6 +11,7 @@ class AdminModalManager {
     this.analyticsMgr = analyticsMgr;
     this.isPickingLocation = false;
     this.selectedPhotos = []; // Max 5 compressed WebP photos
+    this.editingProjectId = null;
   }
 
   init() {
@@ -101,12 +102,26 @@ class AdminModalManager {
   }
 
   bindFormEvents() {
-    // 1. Submit New Project
+    // 1. Submit New or Edited Project
     const formProj = document.getElementById('form-new-project');
     if (formProj) {
       formProj.addEventListener('submit', (e) => {
         e.preventDefault();
-        this.handleCreateProject();
+        if (this.editingProjectId) {
+          this.handleUpdateProject();
+        } else {
+          this.handleCreateProject();
+        }
+      });
+    }
+
+    // Modal Delete Project Button (inside edit modal)
+    const btnDelProj = document.getElementById('btn-delete-project-modal');
+    if (btnDelProj) {
+      btnDelProj.addEventListener('click', () => {
+        if (this.editingProjectId) {
+          this.handleDeleteProject(this.editingProjectId);
+        }
       });
     }
 
@@ -326,20 +341,128 @@ class AdminModalManager {
   }
 
   openNewProjectModal() {
+    this.editingProjectId = null;
     const modal = document.getElementById('modal-new-project');
     if (!modal) return;
+
+    // Reset Title & Action Button
+    const titleEl = document.getElementById('modal-project-title-text');
+    if (titleEl) {
+      titleEl.innerHTML = '<i class="fa-solid fa-seedling text-cyan"></i> 신규 생태계교란생물 제거사업 등록';
+    }
+    const submitBtn = document.getElementById('btn-submit-project');
+    if (submitBtn) {
+      submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> 신규 사업 개설 완료';
+    }
+    const delBtn = document.getElementById('btn-delete-project-modal');
+    if (delBtn) {
+      delBtn.style.display = 'none';
+    }
 
     // Populate Branch Options (Exclude HQ)
     const branchSelect = document.getElementById('proj-branch-select');
     if (branchSelect) {
       const nonHqBranches = this.ds.branches.filter(b => !b.is_hq);
-      const curBranch = this.branchMgr.activeBranchId !== 'all' ? this.branchMgr.activeBranchId : 'jeonbuk';
+      const curBranch = this.branchMgr.activeBranchId !== 'all' ? this.branchMgr.activeBranchId : 'daejeon-chungnam-sejong';
       branchSelect.innerHTML = nonHqBranches.map(b => `
         <option value="${b.id}" ${b.id === curBranch ? 'selected' : ''}>${b.name}</option>
       `).join('');
     }
 
+    // Reset inputs
+    document.getElementById('proj-title-input').value = '';
+    document.getElementById('proj-client-input').value = '기후부';
+    document.getElementById('proj-loc-name-input').value = '';
+    document.getElementById('proj-lat-input').value = '';
+    document.getElementById('proj-lng-input').value = '';
+    document.getElementById('proj-period-input').value = '2026.05 ~ 2026.11';
+    document.getElementById('proj-drone-url-input').value = '';
+    const customInput = document.getElementById('proj-custom-species-input');
+    if (customInput) customInput.value = '';
+
+    // Check defaults
+    document.querySelectorAll('input[name="proj-species"]').forEach(cb => {
+      cb.checked = ['가시박', '단풍잎돼지풀', '환삼덩굴'].includes(cb.value);
+    });
+
     modal.classList.add('active');
+  }
+
+  openEditProjectModal(projectId) {
+    const project = this.ds.projects.find(p => p.id === projectId);
+    if (!project) {
+      alert('수정할 사업을 찾을 수 없습니다.');
+      return;
+    }
+
+    this.editingProjectId = projectId;
+    const modal = document.getElementById('modal-new-project');
+    if (!modal) return;
+
+    // Update Title & Action Button
+    const titleEl = document.getElementById('modal-project-title-text');
+    if (titleEl) {
+      titleEl.innerHTML = `<i class="fa-solid fa-pen-to-square text-cyan"></i> 사업 정보 수정 (${project.title})`;
+    }
+    const submitBtn = document.getElementById('btn-submit-project');
+    if (submitBtn) {
+      submitBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> 사업 정보 수정 저장';
+    }
+    const delBtn = document.getElementById('btn-delete-project-modal');
+    if (delBtn) {
+      delBtn.style.display = 'inline-flex';
+    }
+
+    // Populate Branch Options
+    const branchSelect = document.getElementById('proj-branch-select');
+    if (branchSelect) {
+      const nonHqBranches = this.ds.branches.filter(b => !b.is_hq);
+      branchSelect.innerHTML = nonHqBranches.map(b => `
+        <option value="${b.id}" ${b.id === project.branch_id ? 'selected' : ''}>${b.name}</option>
+      `).join('');
+    }
+
+    // Fill inputs
+    document.getElementById('proj-title-input').value = project.title || '';
+    document.getElementById('proj-client-input').value = project.client || '기후부';
+    document.getElementById('proj-loc-name-input').value = project.location_name || '';
+    document.getElementById('proj-lat-input').value = project.lat !== undefined ? project.lat : '';
+    document.getElementById('proj-lng-input').value = project.lng !== undefined ? project.lng : '';
+    document.getElementById('proj-period-input').value = project.period || '2026.05 ~ 2026.11';
+    document.getElementById('proj-drone-url-input').value = project.live_dashboard_url || '';
+
+    // Check species
+    const targetSpecies = project.target_species || [];
+    const knownSpecies = [];
+    document.querySelectorAll('input[name="proj-species"]').forEach(cb => {
+      knownSpecies.push(cb.value);
+      cb.checked = targetSpecies.includes(cb.value);
+    });
+
+    // Custom species
+    const customList = targetSpecies.filter(s => !knownSpecies.includes(s));
+    const customInput = document.getElementById('proj-custom-species-input');
+    if (customInput) {
+      customInput.value = customList.join(', ');
+    }
+
+    modal.classList.add('active');
+  }
+
+  handleDeleteProject(projectId) {
+    const proj = this.ds.projects.find(p => p.id === projectId);
+    if (!proj) return;
+
+    const confirmed = confirm(
+      `⚠️ [사업 삭제 확인]\n\n'${proj.title}' (${proj.branch_name}) 사업을 완전히 삭제하시겠습니까?\n\n- 이 작업은 취소할 수 없으며, 전국 관제망에서 실시간 삭제됩니다.\n- 관련 작업 통계가 자동으로 재집계됩니다.`
+    );
+
+    if (confirmed) {
+      this.ds.deleteProject(projectId);
+      this.refreshAllUI();
+      this.closeAllModals();
+      this.showToast(`🗑️ [${proj.title}] 사업이 성공적으로 삭제되었습니다.`);
+    }
   }
 
   openActivityModal() {
@@ -391,6 +514,7 @@ class AdminModalManager {
   closeAllModals() {
     document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
     this.isPickingLocation = false;
+    this.editingProjectId = null;
   }
 
   startLocationPicker() {
@@ -411,7 +535,11 @@ class AdminModalManager {
       this.isPickingLocation = false;
       map.off('click', clickHandler);
 
-      this.openNewProjectModal();
+      if (this.editingProjectId) {
+        this.openEditProjectModal(this.editingProjectId);
+      } else {
+        this.openNewProjectModal();
+      }
       this.showToast(`✅ 좌표 설정 완료: ${lat.toFixed(6)}° N, ${lng.toFixed(6)}° E`);
     };
 
@@ -477,6 +605,63 @@ class AdminModalManager {
     this.branchMgr.setBranchFilter(newProject.branch_id);
     this.mapCtrl.flyToProject(newProject.id);
     this.showToast(`🎉 [${newProject.title}] 사업이 성공적으로 등록되었습니다!`);
+  }
+
+  handleUpdateProject() {
+    if (!this.editingProjectId) return;
+    const existing = this.ds.projects.find(p => p.id === this.editingProjectId);
+    if (!existing) return;
+
+    const branchId = document.getElementById('proj-branch-select').value;
+    const branch = this.ds.branches.find(b => b.id === branchId);
+    const title = document.getElementById('proj-title-input').value.trim();
+    const client = document.getElementById('proj-client-input').value.trim();
+    const locName = document.getElementById('proj-loc-name-input').value.trim();
+    const lat = parseFloat(document.getElementById('proj-lat-input').value) || (branch ? branch.lat : existing.lat);
+    const lng = parseFloat(document.getElementById('proj-lng-input').value) || (branch ? branch.lng : existing.lng);
+    const period = document.getElementById('proj-period-input').value.trim() || '2026.05 ~ 2026.11';
+    const droneUrl = document.getElementById('proj-drone-url-input').value.trim();
+
+    // Checked species
+    const species = [];
+    document.querySelectorAll('input[name="proj-species"]:checked').forEach(cb => {
+      species.push(cb.value);
+    });
+
+    // Custom species input
+    const customSpeciesInput = document.getElementById('proj-custom-species-input');
+    if (customSpeciesInput && customSpeciesInput.value.trim()) {
+      const customs = customSpeciesInput.value.split(',').map(s => s.trim()).filter(s => s);
+      species.push(...customs);
+    }
+
+    if (!title) {
+      alert('사업명을 입력해 주세요.');
+      return;
+    }
+
+    const updatedProject = Object.assign({}, existing, {
+      branch_id: branchId,
+      branch_name: branch ? branch.name : existing.branch_name,
+      title: title,
+      client: client || '기후부',
+      organizer: `(사)야생생물관리협회 ${branch ? branch.short_name : ''}`,
+      target_species: species.length ? species : ['가시박'],
+      location_name: locName || existing.location_name,
+      lat: lat,
+      lng: lng,
+      period: period,
+      live_dashboard_url: droneUrl || '',
+      desc: `${branch ? branch.name : ''} 주관 ${title} 현장 방제 및 관제 사업`
+    });
+
+    this.ds.updateProject(updatedProject);
+    this.refreshAllUI();
+    this.closeAllModals();
+
+    this.branchMgr.setBranchFilter(updatedProject.branch_id);
+    this.mapCtrl.flyToProject(updatedProject.id);
+    this.showToast(`✨ [${updatedProject.title}] 사업 정보가 성공적으로 수정되었습니다!`);
   }
 
   handleCreateActivity() {

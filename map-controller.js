@@ -336,7 +336,12 @@ class MapController {
             ${proj.target_species && proj.target_species.length ? `<div style="font-size: 0.72rem; color: #fbbf24; margin-bottom: 3px;">🎯 대상종: <b>${proj.target_species.join(', ')}</b></div>` : ''}
             <div style="font-size: 0.74rem; color: #cbd5e1; margin-bottom: 4px;">위치: ${proj.location_name}</div>
             <div style="font-size: 0.75rem; font-weight: 700; color: #38bdf8; margin-bottom: 6px;">실적: ${(Number(proj.total_area_m2)).toLocaleString()}㎡ (${(proj.total_harvest_kg).toLocaleString()}kg 수거)</div>
-            ${proj.live_dashboard_url ? `<a href="${proj.live_dashboard_url}" target="_blank" style="display:block; text-align:center; font-size:0.75rem; font-weight:700; color:#fff; background:#0284c7; padding:5px 8px; border-radius:4px; text-decoration:none;">🚀 지부 3D 드론 관제 열기</a>` : ''}
+            <div style="display: flex; gap: 6px; margin-top: 6px;">
+              <button type="button" onclick="window.adminModal.openEditProjectModal('${proj.id}')" style="flex: 1; text-align: center; font-size: 0.72rem; font-weight: 700; color: #38bdf8; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3); padding: 5px 8px; border-radius: 4px; cursor: pointer;">
+                ✏️ 사업 수정
+              </button>
+              ${proj.live_dashboard_url ? `<a href="${proj.live_dashboard_url}" target="_blank" style="flex: 1.3; display:block; text-align:center; font-size:0.72rem; font-weight:700; color:#fff; background:#0284c7; padding:5px 8px; border-radius:4px; text-decoration:none;">🚀 드론 관제</a>` : ''}
+            </div>
           </div>
         `);
 

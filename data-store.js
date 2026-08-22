@@ -127,6 +127,24 @@ class DataStore {
       }
     }
 
+    if (remoteData.updatedProject) {
+      const up = remoteData.updatedProject;
+      const idx = this.projects.findIndex(p => p.id === up.id);
+      if (idx >= 0) {
+        this.projects[idx] = Object.assign({}, this.projects[idx], up);
+        hasChanges = true;
+      }
+    }
+
+    if (remoteData.deletedProjectId) {
+      const delId = remoteData.deletedProjectId;
+      const initialLen = this.projects.length;
+      this.projects = this.projects.filter(p => p.id !== delId);
+      if (this.projects.length !== initialLen) {
+        hasChanges = true;
+      }
+    }
+
     if (remoteData.newActivity) {
       const na = remoteData.newActivity;
       if (!this.activities.some(a => a.id === na.id)) {
@@ -189,6 +207,44 @@ class DataStore {
     }
 
     return newProj;
+  }
+
+  updateProject(updatedProj) {
+    const idx = this.projects.findIndex(p => p.id === updatedProj.id);
+    if (idx >= 0) {
+      // Preserve existing cumulative metrics if not provided
+      const existing = this.projects[idx];
+      this.projects[idx] = Object.assign({}, existing, updatedProj, {
+        total_area_m2: updatedProj.total_area_m2 !== undefined ? updatedProj.total_area_m2 : existing.total_area_m2,
+        total_harvest_kg: updatedProj.total_harvest_kg !== undefined ? updatedProj.total_harvest_kg : existing.total_harvest_kg,
+        drone_flights: updatedProj.drone_flights !== undefined ? updatedProj.drone_flights : existing.drone_flights
+      });
+
+      this.saveProjects();
+
+      // Stream to Cloud DB & other branches
+      if (window.cloudSync) {
+        window.cloudSync.syncProjectUpdate(this.projects[idx]);
+      }
+
+      return this.projects[idx];
+    }
+    return null;
+  }
+
+  deleteProject(projectId) {
+    const targetProj = this.projects.find(p => p.id === projectId);
+    if (!targetProj) return false;
+
+    this.projects = this.projects.filter(p => p.id !== projectId);
+    this.saveProjects();
+
+    // Stream deletion to Cloud DB & other branches
+    if (window.cloudSync) {
+      window.cloudSync.syncProjectDelete(projectId);
+    }
+
+    return true;
   }
 
   addActivity(newAct) {
