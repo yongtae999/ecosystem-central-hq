@@ -271,15 +271,27 @@ class BranchMonitorApp {
         </svg>
       `;
 
+      branchWrap.title = `${b.name} [${b.address}]`;
+
+      const branchPopup = new maplibregl.Popup({ offset: [0, -60], closeButton: false, closeOnClick: false }).setHTML(`
+        <div style="color: #0f172a; padding: 4px; font-family: Pretendard, sans-serif;">
+          <b style="color: #0284c7; font-size: 0.85rem;">🏛️ ${b.name}</b>
+          <div style="font-size: 0.75rem; margin-top: 4px;">${b.address}</div>
+          <div style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">전화: ${b.tel}</div>
+        </div>
+      `);
+
+      let bTimer;
+      branchWrap.addEventListener('mouseenter', () => {
+        clearTimeout(bTimer);
+        branchPopup.setLngLat([b.lng, b.lat]).addTo(this.map);
+      });
+      branchWrap.addEventListener('mouseleave', () => {
+        bTimer = setTimeout(() => branchPopup.remove(), 250);
+      });
+
       new maplibregl.Marker({ element: branchWrap, anchor: 'bottom' })
         .setLngLat([b.lng, b.lat])
-        .setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(`
-          <div style="color: #0f172a; padding: 4px; font-family: Pretendard, sans-serif;">
-            <b style="color: #0284c7; font-size: 0.85rem;">🏛️ ${b.name}</b>
-            <div style="font-size: 0.75rem; margin-top: 4px;">${b.address}</div>
-            <div style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">전화: ${b.tel}</div>
-          </div>
-        `))
         .addTo(this.map);
 
       // 2. Add Project Markers if any
@@ -289,6 +301,13 @@ class BranchMonitorApp {
         pWrap.style.width = '110px';
         pWrap.style.height = '60px';
         pWrap.style.cursor = 'pointer';
+        pWrap.title = `${p.title} [${p.location_name}]`;
+
+        let labelText = p.title;
+        if (p.id === 'proj-jb-crayfish-01') labelText = '완주(미국가재)';
+        else if (p.id === 'proj-jb-goldenrod-02') labelText = '익산(양미역취)';
+        else if (labelText.length > 7) labelText = labelText.slice(0, 7) + '..';
+
         pWrap.innerHTML = `
           <svg width="110" height="60" viewBox="0 0 110 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.85));">
             <circle cx="55" cy="60" r="4" fill="none" stroke="#10b981" stroke-width="2">
@@ -305,21 +324,35 @@ class BranchMonitorApp {
             <circle cx="55" cy="35" r="3.5" fill="#ffffff"/>
             <rect x="2" y="2" width="106" height="23" rx="4" fill="#022c22" stroke="#34d399" stroke-width="1.5"/>
             <text x="55" y="17.5" text-anchor="middle" fill="#a7f3d0" font-family="-apple-system, BlinkMacSystemFont, 'Pretendard', sans-serif" font-size="10.5" font-weight="800">
-              🌿 ${p.title.length > 7 ? p.title.slice(0, 7) + '..' : p.title}
+              🌿 ${labelText}
             </text>
           </svg>
         `;
 
+        const projectPopup = new maplibregl.Popup({ offset: [0, -60], closeButton: false, closeOnClick: false }).setHTML(`
+          <div style="color: #0f172a; padding: 6px; font-family: Pretendard, sans-serif; max-width: 240px;">
+            <b style="color: #059669; font-size: 0.88rem;">🌿 ${p.title}</b>
+            <div style="font-size: 0.74rem; margin-top: 4px; color: #334155;">📍 위치: ${p.location_name}</div>
+            <div style="font-size: 0.72rem; color: #d97706; margin-top: 2px;">🎯 대상종: ${Array.isArray(p.target_species) ? p.target_species.join(', ') : p.target_species}</div>
+            <div style="font-size: 0.72rem; color: #0284c7; font-weight: 700; margin-top: 4px;">📊 실적: ${Number(p.total_area_m2).toLocaleString()}㎡ / ${Number(p.total_harvest_kg).toLocaleString()}kg</div>
+          </div>
+        `);
+
+        let pTimer;
+        pWrap.addEventListener('mouseenter', () => {
+          clearTimeout(pTimer);
+          projectPopup.setLngLat([p.lng, p.lat]).addTo(this.map);
+        });
+        pWrap.addEventListener('mouseleave', () => {
+          pTimer = setTimeout(() => projectPopup.remove(), 250);
+        });
+
+        pWrap.addEventListener('click', () => {
+          this.flyToProject(p.id);
+        });
+
         new maplibregl.Marker({ element: pWrap, anchor: 'bottom' })
           .setLngLat([p.lng, p.lat])
-          .setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(`
-            <div style="color: #0f172a; padding: 6px; font-family: Pretendard, sans-serif; max-width: 220px;">
-              <b style="color: #059669; font-size: 0.85rem;">🌿 ${p.title}</b>
-              <div style="font-size: 0.75rem; margin-top: 4px; color: #334155;">📍 ${p.location_name}</div>
-              <div style="font-size: 0.72rem; color: #d97706; margin-top: 2px;">대상: ${Array.isArray(p.target_species) ? p.target_species.join(', ') : p.target_species}</div>
-              <div style="font-size: 0.72rem; color: #0284c7; font-weight: 700; margin-top: 4px;">실적: ${Number(p.total_area_m2).toLocaleString()}㎡ / ${Number(p.total_harvest_kg).toLocaleString()}kg</div>
-            </div>
-          `))
           .addTo(this.map);
       });
 

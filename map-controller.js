@@ -278,7 +278,7 @@ class MapController {
         if (this.onSelectBranch) this.onSelectBranch(branch.id);
       });
 
-      const popup = new maplibregl.Popup({ offset: [0, -60], closeButton: false })
+      const popup = new maplibregl.Popup({ offset: [0, -60], closeButton: false, closeOnClick: false })
         .setHTML(`
           <div style="padding: 6px 4px; font-family: -apple-system, 'Pretendard', sans-serif; min-width: 230px;">
             <div style="font-size: 0.92rem; font-weight: 800; color: ${isHq ? '#fbbf24' : '#38bdf8'}; margin-bottom: 5px;">
@@ -293,12 +293,29 @@ class MapController {
           </div>
         `);
 
+      element.title = `${branch.name} [${branch.address}]`;
+
+      // Hover interaction for Branch Pins
+      let bHoverTimer;
+      element.addEventListener('mouseenter', () => {
+        clearTimeout(bHoverTimer);
+        popup.setLngLat([branch.lng, branch.lat]).addTo(this.map);
+      });
+      element.addEventListener('mouseleave', () => {
+        bHoverTimer = setTimeout(() => popup.remove(), 250);
+      });
+
+      element.addEventListener('click', () => {
+        popup.setLngLat([branch.lng, branch.lat]).addTo(this.map);
+        this.flyToBranch(branch.id);
+        if (this.onSelectBranch) this.onSelectBranch(branch.id);
+      });
+
       const marker = new maplibregl.Marker({
         element: element,
         anchor: 'bottom'
       })
         .setLngLat([branch.lng, branch.lat])
-        .setPopup(popup)
         .addTo(this.map);
 
       this.markers.push(marker);
@@ -311,30 +328,30 @@ class MapController {
         labelText = '천내리습지';
       } else if (proj.id === 'proj-dcs-doowoong-02') {
         labelText = '두웅습지';
+      } else if (proj.id === 'proj-jb-crayfish-01') {
+        labelText = '완주(미국가재)';
+      } else if (proj.id === 'proj-jb-goldenrod-02') {
+        labelText = '익산(양미역취)';
       } else if (proj.location_name) {
         const cleanLoc = proj.location_name.replace(/^(충청남도|전북특별자치도|전라북도|경기도|강원도|경상남도|경상북도|전라남도|제주특별자치도|서울특별시|인천광역시|대전광역시|광주광역시|대구광역시|부산광역시|울산광역시|세종특별자치시)\s*/, '');
         const words = cleanLoc.split(/\s+/);
         labelText = words.slice(0, 2).join(' ') || proj.title;
-      }
-      if (labelText.length > 8) {
-        labelText = labelText.slice(0, 7) + '..';
+        if (labelText.length > 8) {
+          labelText = labelText.slice(0, 7) + '..';
+        }
       }
 
       const element = this.createSvgPin(labelText, 'project', true);
       element.id = `marker-${proj.id}`;
+      element.title = `${proj.title} [${proj.location_name}]`;
 
-      element.addEventListener('click', () => {
-        this.flyToProject(proj.id);
-        if (this.onSelectProject) this.onSelectProject(proj.id);
-      });
-
-      const popup = new maplibregl.Popup({ offset: [0, -60], closeButton: false })
+      const popup = new maplibregl.Popup({ offset: [0, -60], closeButton: false, closeOnClick: false })
         .setHTML(`
-          <div style="padding: 6px 4px; font-family: -apple-system, 'Pretendard', sans-serif; min-width: 230px;">
+          <div style="padding: 6px 4px; font-family: -apple-system, 'Pretendard', sans-serif; min-width: 240px;">
             <div style="font-size: 0.9rem; font-weight: 800; color: #34d399; margin-bottom: 4px;">🌿 ${proj.title}</div>
-            <div style="font-size: 0.74rem; color: #94a3b8; margin-bottom: 3px;">발주처: ${proj.client}</div>
-            ${proj.target_species && proj.target_species.length ? `<div style="font-size: 0.72rem; color: #fbbf24; margin-bottom: 3px;">🎯 대상종: <b>${proj.target_species.join(', ')}</b></div>` : ''}
-            <div style="font-size: 0.74rem; color: #cbd5e1; margin-bottom: 4px;">위치: ${proj.location_name}</div>
+            <div style="font-size: 0.74rem; color: #94a3b8; margin-bottom: 3px;">발주처: ${proj.client} (${proj.organizer || ''})</div>
+            ${proj.target_species && proj.target_species.length ? `<div style="font-size: 0.73rem; color: #fbbf24; margin-bottom: 3px;">🎯 대상종: <b>${proj.target_species.join(', ')}</b></div>` : ''}
+            <div style="font-size: 0.74rem; color: #cbd5e1; margin-bottom: 4px;">📍 위치: ${proj.location_name}</div>
             <div style="font-size: 0.75rem; font-weight: 700; color: #38bdf8; margin-bottom: 6px;">실적: ${(Number(proj.total_area_m2)).toLocaleString()}㎡ (${(proj.total_harvest_kg).toLocaleString()}kg 수거)</div>
             <div style="display: flex; gap: 6px; margin-top: 6px;">
               <button type="button" onclick="window.adminModal.openEditProjectModal('${proj.id}')" style="flex: 1; text-align: center; font-size: 0.72rem; font-weight: 700; color: #38bdf8; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3); padding: 5px 8px; border-radius: 4px; cursor: pointer;">
@@ -345,12 +362,27 @@ class MapController {
           </div>
         `);
 
+      // Hover interaction for Project Pins (instant full title & meta tooltip)
+      let pHoverTimer;
+      element.addEventListener('mouseenter', () => {
+        clearTimeout(pHoverTimer);
+        popup.setLngLat([proj.lng, proj.lat]).addTo(this.map);
+      });
+      element.addEventListener('mouseleave', () => {
+        pHoverTimer = setTimeout(() => popup.remove(), 250);
+      });
+
+      element.addEventListener('click', () => {
+        popup.setLngLat([proj.lng, proj.lat]).addTo(this.map);
+        this.flyToProject(proj.id);
+        if (this.onSelectProject) this.onSelectProject(proj.id);
+      });
+
       const marker = new maplibregl.Marker({
         element: element,
         anchor: 'bottom'
       })
         .setLngLat([proj.lng, proj.lat])
-        .setPopup(popup)
         .addTo(this.map);
 
       this.markers.push(marker);
