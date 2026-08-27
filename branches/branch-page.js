@@ -8,6 +8,7 @@ class BranchMonitorApp {
     this.branchId = branchId;
     this.branchData = null;
     this.projectsData = [];
+    this.activitiesData = [];
     this.map = null;
     this.is3d = false;
   }
@@ -15,25 +16,38 @@ class BranchMonitorApp {
   async init() {
     const t = Date.now();
     try {
-      // 1. Fetch branches and projects
-      const [bRes, pRes] = await Promise.all([
+      // 1. Fetch branches, projects, and activities
+      const [bRes, pRes, aRes] = await Promise.all([
         fetch(`../../data/branches.json?t=${t}`).then(r => r.json()),
-        fetch(`../../data/projects.json?t=${t}`).then(r => r.json())
+        fetch(`../../data/projects.json?t=${t}`).then(r => r.json()),
+        fetch(`../../data/national_activities.json?t=${t}`).then(r => r.json()).catch(() => [])
       ]);
 
       this.branchData = bRes.find(b => b.id === this.branchId);
       
-      // Check dynamic projects from LocalStorage
-      let allProjects = pRes;
+      // 2. Check dynamic projects from LocalStorage & Cloud
+      let allProjects = Array.isArray(pRes) ? pRes : [];
       const localProjects = localStorage.getItem('wma_ecosystem_projects_v5');
       if (localProjects) {
         try {
           const userProjects = JSON.parse(localProjects);
-          allProjects = [...pRes, ...userProjects.filter(up => !pRes.some(p => p.id === up.id))];
+          allProjects = [...allProjects, ...userProjects.filter(up => !allProjects.some(p => p.id === up.id))];
         } catch (e) {}
       }
 
       this.projectsData = allProjects.filter(p => p.branch_id === this.branchId);
+
+      // 3. Check dynamic activities from LocalStorage & Cloud
+      let allActivities = Array.isArray(aRes) ? aRes : [];
+      const localActivities = localStorage.getItem('wma_ecosystem_activities_v5');
+      if (localActivities) {
+        try {
+          const userActs = JSON.parse(localActivities);
+          allActivities = [...userActs, ...allActivities.filter(a => !userActs.some(ua => ua.id === a.id))];
+        } catch (e) {}
+      }
+
+      this.activitiesData = allActivities.filter(a => a.branch_id === this.branchId);
 
       if (!this.branchData) {
         console.error("Branch not found:", this.branchId);
@@ -42,6 +56,7 @@ class BranchMonitorApp {
 
       this.renderBranchInfo();
       this.renderProjectsList();
+      this.renderActivitiesList();
       this.initMap();
 
       // Subscribe to real-time updates from other branches & HQ (BroadcastChannel)
@@ -74,6 +89,14 @@ class BranchMonitorApp {
             pill.className = 'live-status-pill offline';
             pill.innerHTML = '<span class="live-dot standby"></span><span>관제망 정상 연동</span>';
           }
+        });
+      }
+      // Subscribe to local storage sync event
+      if (!this.eventSubscribed) {
+        this.eventSubscribed = true;
+        window.addEventListener('wma_data_synced', () => {
+          console.log(`⚡ [BranchMonitor] Local data synced event received for branch: ${this.branchId}`);
+          this.init();
         });
       }
     } catch (err) {
@@ -147,6 +170,66 @@ class BranchMonitorApp {
         ${p.live_dashboard_url ? `<a href="${p.live_dashboard_url}" target="_blank" class="btn-tactical primary" style="width: 100%; justify-content: center; font-size: 0.72rem;">🚀 3D 드론 정사영상 열기</a>` : ''}
       </div>
     `).join('');
+  }
+
+  renderActivitiesList() {
+    let container = document.getElementById('branch-activities-list');
+    if (!container) {
+      const rightSidebar = document.querySelector('.right-sidebar');
+      if (rightSidebar) {
+        const sec = document.createElement('div');
+        sec.className = 'sidebar-section';
+        sec.style.flex = '1';
+        sec.style.overflowY = 'auto';
+        sec.style.maxHeight = '420px';
+        sec.innerHTML = `
+          <div class="section-title">
+            <i class="fa-solid fa-clipboard-list text-cyan"></i> 현장 작업일지 실적 (${this.activitiesData.length}건)
+          </div>
+          <div id="branch-activities-list"></div>
+        `;
+        rightSidebar.insertBefore(sec, rightSidebar.lastElementChild);
+        container = document.getElementById('branch-activities-list');
+      }
+    }
+    if (!container) return;
+
+    if (this.activitiesData.length === 0) {
+      container.innerHTML = `
+        <div style="color: var(--text-muted); font-size: 0.75rem; text-align: center; padding: 16px 8px; line-height: 1.5;">
+          <i class="fa-solid fa-clipboard-check" style="font-size: 1.2rem; margin-bottom: 6px; display: block; color: var(--accent-cyan);"></i>
+          등록된 작업일지 대기 중<br>
+          <small style="color: #64748b;">중앙 통합 관제 플랫폼에서 작업일지가 등록되면 여기에 실시간 표출됩니다.</small>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = this.activitiesData.map(act => {
+      const photosHtml = act.photos && act.photos.length ? `
+        <div style="display: flex; gap: 4px; margin-top: 6px; overflow-x: auto; padding-bottom: 2px;">
+          ${act.photos.map(p => `
+            <img src="${p.dataUrl}" alt="${p.name}" style="width: 46px; height: 34px; object-fit: cover; border-radius: 4px; border: 1px solid rgba(56,189,248,0.4); cursor: pointer;" onclick="window.open('${p.dataUrl}')">
+          `).join('')}
+        </div>
+      ` : '';
+
+      return `
+        <div style="background: rgba(15,23,42,0.7); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 10px; margin-bottom: 8px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+            <span style="font-size: 0.72rem; font-weight: 700; color: #38bdf8;">📅 ${act.date}</span>
+            <span style="font-size: 0.68rem; padding: 1px 6px; border-radius: 3px; background: rgba(16,185,129,0.2); color: #34d399; font-weight: 700;">${act.status || '완료'}</span>
+          </div>
+          <div style="font-size: 0.8rem; font-weight: 700; color: #f8fafc; margin-bottom: 2px;">${act.work_type || '제거작업'}</div>
+          <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 4px;">${act.project_title || act.location}</div>
+          <div style="font-size: 0.74rem; font-weight: 700; color: #34d399;">
+            면적: ${Number(act.area_m2).toLocaleString()}㎡ · 수거량: ${Number(act.harvest_kg).toLocaleString()}kg ${act.worker_count ? `· 인원: ${act.worker_count}명` : ''}
+          </div>
+          ${act.summary ? `<div style="font-size: 0.7rem; color: #cbd5e1; margin-top: 4px; line-height: 1.4; background: rgba(0,0,0,0.25); padding: 4px 6px; border-radius: 4px;">${act.summary}</div>` : ''}
+          ${photosHtml}
+        </div>
+      `;
+    }).join('');
   }
 
   initMap() {
