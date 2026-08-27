@@ -1,5 +1,20 @@
 [
   {
+    "id": "act-dcs-04",
+    "branch_id": "daejeon-chungnam-sejong",
+    "branch_name": "대전·충남·세종 지부",
+    "project_id": "proj-dcs-geumgang-01",
+    "project_title": "천내리습지 생태계교란식물 제거사업",
+    "date": "2026-08-27",
+    "work_type": "4차 개화전 집중 차단 (환삼70%·가시30%)",
+    "worker_count": 5,
+    "area_m2": 30000,
+    "harvest_kg": 1000,
+    "location": "충청남도 금산군 제원면 천내리습지 2·3구간",
+    "summary": "천내리습지 4차 생태계교란식물 집중 제거 완료 (환삼덩굴 70% 700kg/21,000㎡, 가시박 30% 300kg/9,000㎡, 인원 5명)",
+    "status": "완료"
+  },
+  {
     "id": "act-dcs-01",
     "branch_id": "daejeon-chungnam-sejong",
     "branch_name": "대전·충남·세종 지부",
@@ -10,8 +25,38 @@
     "worker_count": 6,
     "area_m2": 36000,
     "harvest_kg": 1200,
-    "location": "금산군 천내리습지 (B구간 70% · A구간 30%)",
+    "location": "충청남도 금산군 제원면 천내리습지 1·2구간",
     "summary": "천내리습지 3차 생태계교란식물(가시박·환삼덩굴) 집중 제거 (B구간 840kg/25,200㎡, A구간 360kg/10,800㎡)",
+    "status": "완료"
+  },
+  {
+    "id": "act-dcs-02b",
+    "branch_id": "daejeon-chungnam-sejong",
+    "branch_name": "대전·충남·세종 지부",
+    "project_id": "proj-dcs-geumgang-01",
+    "project_title": "천내리습지 생태계교란식물 제거사업",
+    "date": "2026-08-06",
+    "work_type": "2차 성장기 예초 및 낫베기",
+    "worker_count": 5,
+    "area_m2": 48000,
+    "harvest_kg": 800,
+    "location": "충청남도 금산군 제원면 천내리습지 일원",
+    "summary": "천내리습지 2차 가시박·환삼덩굴 예초 및 낫베기 제거 완료 (48,000㎡ / 800kg)",
+    "status": "완료"
+  },
+  {
+    "id": "act-dcs-01b",
+    "branch_id": "daejeon-chungnam-sejong",
+    "branch_name": "대전·충남·세종 지부",
+    "project_id": "proj-dcs-geumgang-01",
+    "project_title": "천내리습지 생태계교란식물 제거사업",
+    "date": "2026-07-24",
+    "work_type": "1차 발아기 손 뿌리뽑기",
+    "worker_count": 4,
+    "area_m2": 18000,
+    "harvest_kg": 80,
+    "location": "충청남도 금산군 제원면 천내리습지 상류부",
+    "summary": "천내리습지 1차 발아기 유생 손 뿌리뽑기 방제 (18,000㎡ / 80kg)",
     "status": "완료"
   },
   {
