@@ -132,13 +132,17 @@ class BranchMonitorApp {
 
     const areaEl = document.getElementById('stat-total-area');
     if (areaEl) {
-      const totalArea = this.projectsData.reduce((acc, p) => acc + (Number(p.total_area_m2) || 0), 0);
+      const projectAreaSum = this.projectsData.reduce((acc, p) => acc + (Number(p.total_area_m2) || 0), 0);
+      const activityAreaSum = this.activitiesData.reduce((acc, a) => acc + (Number(a.area_m2) || 0), 0);
+      const totalArea = Math.max(projectAreaSum, activityAreaSum);
       areaEl.textContent = `${totalArea.toLocaleString()} ㎡`;
     }
 
     const harvestEl = document.getElementById('stat-total-harvest');
     if (harvestEl) {
-      const totalHarvest = this.projectsData.reduce((acc, p) => acc + (Number(p.total_harvest_kg) || 0), 0);
+      const projectHarvestSum = this.projectsData.reduce((acc, p) => acc + (Number(p.total_harvest_kg) || 0), 0);
+      const activityHarvestSum = this.activitiesData.reduce((acc, a) => acc + (Number(a.harvest_kg) || 0), 0);
+      const totalHarvest = Math.max(projectHarvestSum, activityHarvestSum);
       harvestEl.textContent = `${totalHarvest.toLocaleString()} kg`;
     }
   }
