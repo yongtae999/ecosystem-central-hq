@@ -153,12 +153,12 @@
     "fax": "063-853-7889",
     "leader": "지부장 정영국 (010-5678-0000)",
     "manager": "국장 양현진 (010-9444-2082)",
-    "status": "standby",
-    "active_projects_count": 0,
+    "status": "active",
+    "active_projects_count": 2,
     "total_work_area_m2": 0,
     "total_harvest_kg": 0,
     "dashboard_url": "branches/jeonbuk/index.html",
-    "desc": "만경강·동진강 수계 및 새만금 일원 사업 연동 대기"
+    "desc": "만경강 완주군 미국가재 및 익산시 춘포면 양미역취·가시박 교란생물 집중 관제"
   },
   {
     "id": "gwangju-jeonnam",

@@ -11,6 +11,7 @@ class BranchMonitorApp {
     this.activitiesData = [];
     this.map = null;
     this.is3d = false;
+    window.branchApp = this;
   }
 
   async init() {
@@ -166,79 +167,34 @@ class BranchMonitorApp {
     }
 
     container.innerHTML = this.projectsData.map(p => `
-      <div style="background: rgba(15,23,42,0.7); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 12px; margin-bottom: 8px;">
+      <div class="branch-proj-card" style="background: rgba(15,23,42,0.7); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 12px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s ease;" onclick="window.branchApp.flyToProject('${p.id}')">
         <div style="font-size: 0.84rem; font-weight: 800; color: #34d399; margin-bottom: 4px;">🌿 ${p.title}</div>
         <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 2px;">발주처: ${p.client}</div>
         <div style="font-size: 0.72rem; color: #cbd5e1; margin-bottom: 4px;">위치: ${p.location_name}</div>
+        <div style="font-size: 0.72rem; color: #f59e0b; margin-bottom: 4px;">대상종: ${Array.isArray(p.target_species) ? p.target_species.join(', ') : p.target_species || '교란생물'}</div>
         <div style="font-size: 0.75rem; font-weight: 700; color: #38bdf8; margin-bottom: 6px;">실적: ${(Number(p.total_area_m2)).toLocaleString()}㎡ / ${(Number(p.total_harvest_kg)).toLocaleString()}kg</div>
-        ${p.live_dashboard_url ? `<a href="${p.live_dashboard_url}" target="_blank" class="btn-tactical primary" style="width: 100%; justify-content: center; font-size: 0.72rem;">🚀 3D 드론 정사영상 열기</a>` : ''}
+        ${p.live_dashboard_url ? `<a href="${p.live_dashboard_url}" target="_blank" class="btn-tactical primary" style="width: 100%; justify-content: center; font-size: 0.72rem;" onclick="event.stopPropagation();">🚀 3D 드론 정사영상 열기</a>` : ''}
       </div>
     `).join('');
   }
 
-  renderActivitiesList() {
-    let container = document.getElementById('branch-activities-list');
-    if (!container) {
-      const rightSidebar = document.querySelector('.right-sidebar');
-      if (rightSidebar) {
-        const sec = document.createElement('div');
-        sec.className = 'sidebar-section';
-        sec.style.flex = '1';
-        sec.style.overflowY = 'auto';
-        sec.style.maxHeight = '420px';
-        sec.innerHTML = `
-          <div class="section-title">
-            <i class="fa-solid fa-clipboard-list text-cyan"></i> 현장 작업일지 실적 (${this.activitiesData.length}건)
-          </div>
-          <div id="branch-activities-list"></div>
-        `;
-        rightSidebar.insertBefore(sec, rightSidebar.lastElementChild);
-        container = document.getElementById('branch-activities-list');
-      }
+  flyToProject(projId) {
+    const proj = this.projectsData.find(p => p.id === projId);
+    if (proj && this.map && proj.lat && proj.lng) {
+      this.map.flyTo({
+        center: [proj.lng, proj.lat],
+        zoom: 15.5,
+        pitch: 50,
+        bearing: 20,
+        duration: 2000
+      });
     }
-    if (!container) return;
-
-    if (this.activitiesData.length === 0) {
-      container.innerHTML = `
-        <div style="color: var(--text-muted); font-size: 0.75rem; text-align: center; padding: 16px 8px; line-height: 1.5;">
-          <i class="fa-solid fa-clipboard-check" style="font-size: 1.2rem; margin-bottom: 6px; display: block; color: var(--accent-cyan);"></i>
-          등록된 작업일지 대기 중<br>
-          <small style="color: #64748b;">중앙 통합 관제 플랫폼에서 작업일지가 등록되면 여기에 실시간 표출됩니다.</small>
-        </div>
-      `;
-      return;
-    }
-
-    container.innerHTML = this.activitiesData.map(act => {
-      const photosHtml = act.photos && act.photos.length ? `
-        <div style="display: flex; gap: 4px; margin-top: 6px; overflow-x: auto; padding-bottom: 2px;">
-          ${act.photos.map(p => `
-            <img src="${p.dataUrl}" alt="${p.name}" style="width: 46px; height: 34px; object-fit: cover; border-radius: 4px; border: 1px solid rgba(56,189,248,0.4); cursor: pointer;" onclick="window.open('${p.dataUrl}')">
-          `).join('')}
-        </div>
-      ` : '';
-
-      return `
-        <div style="background: rgba(15,23,42,0.7); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 10px; margin-bottom: 8px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-            <span style="font-size: 0.72rem; font-weight: 700; color: #38bdf8;">📅 ${act.date}</span>
-            <span style="font-size: 0.68rem; padding: 1px 6px; border-radius: 3px; background: rgba(16,185,129,0.2); color: #34d399; font-weight: 700;">${act.status || '완료'}</span>
-          </div>
-          <div style="font-size: 0.8rem; font-weight: 700; color: #f8fafc; margin-bottom: 2px;">${act.work_type || '제거작업'}</div>
-          <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 4px;">${act.project_title || act.location}</div>
-          <div style="font-size: 0.74rem; font-weight: 700; color: #34d399;">
-            면적: ${Number(act.area_m2).toLocaleString()}㎡ · 수거량: ${Number(act.harvest_kg).toLocaleString()}kg ${act.worker_count ? `· 인원: ${act.worker_count}명` : ''}
-          </div>
-          ${act.summary ? `<div style="font-size: 0.7rem; color: #cbd5e1; margin-top: 4px; line-height: 1.4; background: rgba(0,0,0,0.25); padding: 4px 6px; border-radius: 4px;">${act.summary}</div>` : ''}
-          ${photosHtml}
-        </div>
-      `;
-    }).join('');
   }
 
   initMap() {
     const b = this.branchData;
     const center = [b.lng, b.lat];
+    const initialZoom = this.projectsData.length > 0 ? 11.2 : (b.zoom || 13.5);
 
     this.map = new maplibregl.Map({
       container: 'map-viewport',
@@ -289,8 +245,8 @@ class BranchMonitorApp {
         ]
       },
       center: center,
-      zoom: b.zoom || 15.5,
-      pitch: 0,
+      zoom: initialZoom,
+      pitch: 35,
       bearing: 0,
       maxPitch: 85
     });
@@ -303,6 +259,7 @@ class BranchMonitorApp {
       branchWrap.className = 'hq-svg-marker-wrapper';
       branchWrap.style.width = '96px';
       branchWrap.style.height = '60px';
+      branchWrap.style.cursor = 'pointer';
       branchWrap.innerHTML = `
         <svg width="96" height="60" viewBox="0 0 96 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.85));">
           <path d="M 38 35 C 38 35 39 48 48 60 C 57 48 58 35 58 35 A 10 10 0 1 0 38 35 Z" fill="#0284c7" stroke="#ffffff" stroke-width="2"/>
@@ -316,38 +273,63 @@ class BranchMonitorApp {
 
       new maplibregl.Marker({ element: branchWrap, anchor: 'bottom' })
         .setLngLat([b.lng, b.lat])
+        .setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(`
+          <div style="color: #0f172a; padding: 4px; font-family: Pretendard, sans-serif;">
+            <b style="color: #0284c7; font-size: 0.85rem;">🏛️ ${b.name}</b>
+            <div style="font-size: 0.75rem; margin-top: 4px;">${b.address}</div>
+            <div style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">전화: ${b.tel}</div>
+          </div>
+        `))
         .addTo(this.map);
 
       // 2. Add Project Markers if any
       this.projectsData.forEach(p => {
         const pWrap = document.createElement('div');
         pWrap.className = 'hq-svg-marker-wrapper';
-        pWrap.style.width = '96px';
+        pWrap.style.width = '110px';
         pWrap.style.height = '60px';
+        pWrap.style.cursor = 'pointer';
         pWrap.innerHTML = `
-          <svg width="96" height="60" viewBox="0 0 96 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.85));">
-            <circle cx="48" cy="60" r="4" fill="none" stroke="#10b981" stroke-width="2">
+          <svg width="110" height="60" viewBox="0 0 110 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.85));">
+            <circle cx="55" cy="60" r="4" fill="none" stroke="#10b981" stroke-width="2">
               <animate attributeName="r" from="4" to="26" dur="2s" repeatCount="indefinite" />
               <animate attributeName="opacity" from="0.9" to="0" dur="2s" repeatCount="indefinite" />
               <animate attributeName="stroke-width" from="2" to="0.5" dur="2s" repeatCount="indefinite" />
             </circle>
-            <circle cx="48" cy="60" r="4" fill="none" stroke="#10b981" stroke-width="1.5">
+            <circle cx="55" cy="60" r="4" fill="none" stroke="#10b981" stroke-width="1.5">
               <animate attributeName="r" from="4" to="26" dur="2s" begin="1s" repeatCount="indefinite" />
               <animate attributeName="opacity" from="0.9" to="0" dur="2s" begin="1s" repeatCount="indefinite" />
               <animate attributeName="stroke-width" from="1.5" to="0.5" dur="2s" begin="1s" repeatCount="indefinite" />
             </circle>
-            <path d="M 38 35 C 38 35 39 48 48 60 C 57 48 58 35 58 35 A 10 10 0 1 0 38 35 Z" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
-            <circle cx="48" cy="35" r="3.5" fill="#ffffff"/>
-            <rect x="4" y="2" width="88" height="23" rx="4" fill="#022c22" stroke="#34d399" stroke-width="1.5"/>
-            <text x="48" y="17.5" text-anchor="middle" fill="#a7f3d0" font-family="-apple-system, BlinkMacSystemFont, 'Pretendard', sans-serif" font-size="11" font-weight="800">
-              🌿 ${p.title.slice(0, 5)}...
+            <path d="M 45 35 C 45 35 46 48 55 60 C 64 48 65 35 65 35 A 10 10 0 1 0 45 35 Z" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
+            <circle cx="55" cy="35" r="3.5" fill="#ffffff"/>
+            <rect x="2" y="2" width="106" height="23" rx="4" fill="#022c22" stroke="#34d399" stroke-width="1.5"/>
+            <text x="55" y="17.5" text-anchor="middle" fill="#a7f3d0" font-family="-apple-system, BlinkMacSystemFont, 'Pretendard', sans-serif" font-size="10.5" font-weight="800">
+              🌿 ${p.title.length > 7 ? p.title.slice(0, 7) + '..' : p.title}
             </text>
           </svg>
         `;
+
         new maplibregl.Marker({ element: pWrap, anchor: 'bottom' })
           .setLngLat([p.lng, p.lat])
+          .setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(`
+            <div style="color: #0f172a; padding: 6px; font-family: Pretendard, sans-serif; max-width: 220px;">
+              <b style="color: #059669; font-size: 0.85rem;">🌿 ${p.title}</b>
+              <div style="font-size: 0.75rem; margin-top: 4px; color: #334155;">📍 ${p.location_name}</div>
+              <div style="font-size: 0.72rem; color: #d97706; margin-top: 2px;">대상: ${Array.isArray(p.target_species) ? p.target_species.join(', ') : p.target_species}</div>
+              <div style="font-size: 0.72rem; color: #0284c7; font-weight: 700; margin-top: 4px;">실적: ${Number(p.total_area_m2).toLocaleString()}㎡ / ${Number(p.total_harvest_kg).toLocaleString()}kg</div>
+            </div>
+          `))
           .addTo(this.map);
       });
+
+      // Fit bounds if multiple points exist
+      if (this.projectsData.length > 0) {
+        const bounds = new maplibregl.LngLatBounds();
+        bounds.extend([b.lng, b.lat]);
+        this.projectsData.forEach(p => bounds.extend([p.lng, p.lat]));
+        this.map.fitBounds(bounds, { padding: 90, maxZoom: 14.5, duration: 1500 });
+      }
     };
 
     if (this.map.loaded()) {
@@ -358,6 +340,4 @@ class BranchMonitorApp {
   }
 }
 
-
 window.BranchMonitorApp = BranchMonitorApp;
-
