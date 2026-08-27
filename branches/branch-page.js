@@ -17,43 +17,84 @@ class BranchMonitorApp {
   async init() {
     const t = Date.now();
     try {
-      // 1. Fetch branches, projects, and activities
-      const [bRes, pRes, aRes] = await Promise.all([
-        fetch(`../../data/branches.json?t=${t}`).then(r => r.json()),
-        fetch(`../../data/projects.json?t=${t}`).then(r => r.json()),
-        fetch(`../../data/national_activities.json?t=${t}`).then(r => r.json()).catch(() => [])
-      ]);
+      // 1. Fetch branches, projects, and activities with robust fallback
+      let bRes = null;
+      let pRes = null;
+      let aRes = [];
 
-      this.branchData = bRes.find(b => b.id === this.branchId);
+      try {
+        const results = await Promise.all([
+          fetch(`../../data/branches.json?t=${t}`).then(r => r.ok ? r.json() : null),
+          fetch(`../../data/projects.json?t=${t}`).then(r => r.ok ? r.json() : null),
+          fetch(`../../data/national_activities.json?t=${t}`).then(r => r.ok ? r.json() : []).catch(() => [])
+        ]);
+        bRes = results[0];
+        pRes = results[1];
+        aRes = results[2] || [];
+      } catch (e) {
+        console.warn("Path fetch fallback:", e);
+      }
+
+      // Built-in fallback branches dataset
+      if (!bRes || !Array.isArray(bRes)) {
+        bRes = [
+          { id: "daejeon-chungnam-sejong", name: "대전·충남·세종 지부", short_name: "대전충남세종", region_code: "DCS", lat: 36.473633, lng: 127.135716, zoom: 15.5, address: "충청남도 공주시 번영1로 99 (신관동)", tel: "041-932-6068", leader: "공 석", manager: "국장 권용태 (010-5871-4842)", status: "active", active_projects_count: 2, total_work_area_m2: 132000, total_harvest_kg: 3080, dashboard_url: "https://yongtae999.github.io/geumgang-drone-monitor/" },
+          { id: "jeonbuk", name: "전북 지부", short_name: "전북", region_code: "JB", lat: 35.929300, lng: 126.953120, zoom: 15.5, address: "전북특별자치도 익산시 목천로 7길 19 102호", tel: "063-853-7888", leader: "지부장 정영국 (010-5678-0000)", manager: "국장 양현진 (010-9444-2082)", status: "active", active_projects_count: 2, total_work_area_m2: 0, total_harvest_kg: 0, dashboard_url: "branches/jeonbuk/index.html" },
+          { id: "seoul-gyeonggi", name: "서울·인천·경기 지부", short_name: "서울인천경기", region_code: "SIG", lat: 37.818450, lng: 127.181230, zoom: 15.5, address: "경기도 포천시 가산면 가산로 321(마산리)", tel: "031-542-3480", leader: "지부장 이인모", manager: "국장 문혜선", status: "standby", active_projects_count: 0, total_work_area_m2: 0, total_harvest_kg: 0 },
+          { id: "gangwon", name: "강원 지부", short_name: "강원", region_code: "GW", lat: 37.324991, lng: 127.980181, zoom: 15.5, address: "강원특별자치도 원주시 양지로 70", tel: "033-734-4010", leader: "지부장 심영배", manager: "국장 임문수", status: "standby", active_projects_count: 0, total_work_area_m2: 0, total_harvest_kg: 0 },
+          { id: "chungbuk", name: "충북 지부", short_name: "충북", region_code: "CB", lat: 36.626342, lng: 127.509700, zoom: 15.5, address: "충청북도 청주시 상당구 중고개로 187 4층", tel: "043-265-5845", leader: "지부장 연영창", manager: "국장 권태수", status: "standby", active_projects_count: 0, total_work_area_m2: 0, total_harvest_kg: 0 },
+          { id: "daegu-gyeongbuk", name: "대구·경북 지부", short_name: "대구경북", region_code: "DGB", lat: 35.896341, lng: 128.514256, zoom: 15.5, address: "대구광역시 북구 한강로4길 9", tel: "053-312-0617", leader: "지부장 류석대", manager: "국장 민경태", status: "standby", active_projects_count: 0, total_work_area_m2: 0, total_harvest_kg: 0 },
+          { id: "busan-ulsan-gyeongnam", name: "부산·울산·경남 지부", short_name: "부산울산경남", region_code: "BUG", lat: 35.189068, lng: 128.245235, zoom: 15.5, address: "경상남도 진주시 진성면 동부로 1355", tel: "055-759-2626", leader: "공 석", manager: "국장 박도범", status: "standby", active_projects_count: 0, total_work_area_m2: 0, total_harvest_kg: 0 },
+          { id: "gwangju-jeonnam", name: "광주·전남 지부", short_name: "광주전남", region_code: "GJN", lat: 35.118230, lng: 126.860983, zoom: 15.5, address: "광주광역시 서구 매월2로15번길 16", tel: "062-374-6969", leader: "공 석", manager: "국장 이범기", status: "standby", active_projects_count: 0, total_work_area_m2: 0, total_harvest_kg: 0 },
+          { id: "jeju", name: "제주 지부", short_name: "제주", region_code: "JJ", lat: 33.495502, lng: 126.517837, zoom: 15.5, address: "제주특별자치도 제주시 서광로2길 24", tel: "064-702-2682", leader: "지부장 이성근", manager: "국장 장호진", status: "standby", active_projects_count: 0, total_work_area_m2: 0, total_harvest_kg: 0 }
+        ];
+      }
+
+      // Built-in fallback projects dataset
+      if (!pRes || !Array.isArray(pRes)) {
+        pRes = [
+          { id: "proj-dcs-geumgang-01", branch_id: "daejeon-chungnam-sejong", branch_name: "대전·충남·세종 지부", title: "천내리습지 생태계교란식물 제거사업", client: "기후부 금강유역환경청", target_species: ["가시박", "단풍잎돼지풀", "환삼덩굴"], location_name: "충청남도 금산군 제원면 천내리습지 1·2·3구간", lat: 36.126830, lng: 127.589850, total_area_m2: 132000, total_harvest_kg: 3080, live_dashboard_url: "https://yongtae999.github.io/geumgang-drone-monitor/" },
+          { id: "proj-dcs-doowoong-02", branch_id: "daejeon-chungnam-sejong", branch_name: "대전·충남·세종 지부", title: "2026년 두웅습지 외래생물 실태조사 및 확산방지 용역", client: "기후부 금강유역환경청", target_species: ["황소개구리", "미국수련"], location_name: "충청남도 태안군 원북면 신두리 1417 두웅습지 람사르습지보호지역", lat: 36.832960, lng: 126.197920, total_area_m2: 0, total_harvest_kg: 0, live_dashboard_url: "" },
+          { id: "proj-jb-crayfish-01", branch_id: "jeonbuk", branch_name: "전북특별자치도 지부", title: "2026년 생태계교란 생물(미국가재) 제거사업", client: "전북지방환경청", organizer: "(사)야생생물관리협회 전북지부", status: "ongoing", status_label: "진행중", target_species: ["미국가재"], location_name: "전북 완주군 일원", lat: 35.904820, lng: 127.162050, total_area_m2: 0, total_harvest_kg: 0 },
+          { id: "proj-jb-goldenrod-02", branch_id: "jeonbuk", branch_name: "전북특별자치도 지부", title: "2026년 생태계교란 식물(양미역취 등) 제거사업", client: "전북지방환경청", organizer: "(사)야생생물관리협회 전북지부", status: "ongoing", status_label: "진행중", target_species: ["양미역취", "가시박", "환삼덩굴"], location_name: "전북 익산시 춘포면 일원", lat: 35.918500, lng: 127.005000, total_area_m2: 0, total_harvest_kg: 0 }
+        ];
+      }
+
+      this.branchData = bRes.find(b => b.id === this.branchId) || bRes[1];
       
       // 2. Check dynamic projects from LocalStorage & Cloud
-      let allProjects = Array.isArray(pRes) ? pRes : [];
+      let allProjects = Array.isArray(pRes) ? [...pRes] : [];
       const localProjects = localStorage.getItem('wma_ecosystem_projects_v5');
       if (localProjects) {
         try {
           const userProjects = JSON.parse(localProjects);
-          allProjects = [...allProjects, ...userProjects.filter(up => !allProjects.some(p => p.id === up.id))];
+          if (Array.isArray(userProjects)) {
+            userProjects.forEach(up => {
+              const idx = allProjects.findIndex(p => p.id === up.id);
+              if (idx >= 0) allProjects[idx] = Object.assign({}, allProjects[idx], up);
+              else allProjects.push(up);
+            });
+          }
         } catch (e) {}
       }
 
       this.projectsData = allProjects.filter(p => p.branch_id === this.branchId);
 
       // 3. Check dynamic activities from LocalStorage & Cloud
-      let allActivities = Array.isArray(aRes) ? aRes : [];
+      let allActivities = Array.isArray(aRes) ? [...aRes] : [];
       const localActivities = localStorage.getItem('wma_ecosystem_activities_v5');
       if (localActivities) {
         try {
           const userActs = JSON.parse(localActivities);
-          allActivities = [...userActs, ...allActivities.filter(a => !userActs.some(ua => ua.id === a.id))];
+          if (Array.isArray(userActs)) {
+            userActs.forEach(ua => {
+              if (!allActivities.some(a => a.id === ua.id)) allActivities.unshift(ua);
+            });
+          }
         } catch (e) {}
       }
 
       this.activitiesData = allActivities.filter(a => a.branch_id === this.branchId);
-
-      if (!this.branchData) {
-        console.error("Branch not found:", this.branchId);
-        return;
-      }
 
       this.renderBranchInfo();
       this.renderProjectsList();
@@ -200,8 +241,26 @@ class BranchMonitorApp {
     const b = this.branchData;
     if (!b) return;
 
-    const center = [b.lng, b.lat];
-    const initialZoom = this.projectsData.length > 0 ? 11.0 : (b.zoom || 13.5);
+    // Calculate center based on office + projects
+    let center = [b.lng, b.lat];
+    let initialZoom = b.zoom || 13.5;
+
+    if (this.projectsData.length > 0) {
+      let sumLng = b.lng;
+      let sumLat = b.lat;
+      let count = 1;
+      this.projectsData.forEach(p => {
+        const pLat = parseFloat(p.lat);
+        const pLng = parseFloat(p.lng);
+        if (!isNaN(pLat) && !isNaN(pLng)) {
+          sumLng += pLng;
+          sumLat += pLat;
+          count++;
+        }
+      });
+      center = [sumLng / count, sumLat / count];
+      initialZoom = 11.2;
+    }
 
     this.map = new maplibregl.Map({
       container: 'map-viewport',
@@ -235,16 +294,25 @@ class BranchMonitorApp {
       zoom: initialZoom,
       pitch: 30,
       bearing: 0,
-      maxPitch: 85
+      maxPitch: 85,
+      antialias: true
     });
 
     this.map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
     this.map.addControl(new maplibregl.ScaleControl({ maxWidth: 100, unit: 'metric' }), 'bottom-left');
 
-    this.map.on('load', () => {
-      this.map.resize();
-      this.setupMarkers();
-    });
+    const onMapReady = () => {
+      if (this.map) {
+        this.map.resize();
+        this.setupMarkers();
+      }
+    };
+
+    if (this.map.loaded()) {
+      onMapReady();
+    } else {
+      this.map.on('load', onMapReady);
+    }
 
     window.addEventListener('resize', () => {
       if (this.map) this.map.resize();
@@ -365,18 +433,9 @@ class BranchMonitorApp {
         .addTo(this.map);
       this.markers.push(pMarker);
     });
-
-    // Fit bounds if multiple points exist
-    if (this.projectsData.length > 0) {
-      const bounds = new maplibregl.LngLatBounds();
-      bounds.extend([b.lng, b.lat]);
-      this.projectsData.forEach(p => {
-        if (p.lng && p.lat) bounds.extend([p.lng, p.lat]);
-      });
-      this.map.fitBounds(bounds, { padding: 90, maxZoom: 13.5, duration: 1500 });
-    }
   }
 }
 
 window.BranchMonitorApp = BranchMonitorApp;
+
 
