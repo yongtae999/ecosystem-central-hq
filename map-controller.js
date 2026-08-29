@@ -202,6 +202,10 @@ class MapController {
     let textLabelColor = '#ffffff';
     let pinFill = '#0284c7';
     let iconSymbol = '🏛️';
+    let width = 96;
+    let centerX = 48;
+    let rectWidth = 88;
+    let fontSize = '11';
 
     if (type === 'hq') {
       bgLabel = '#271702';
@@ -209,45 +213,52 @@ class MapController {
       textLabelColor = '#fef08a';
       pinFill = '#fbbf24';
       iconSymbol = '👑';
+      width = 96;
+      centerX = 48;
+      rectWidth = 88;
+      fontSize = '11';
     } else if (type === 'project') {
       bgLabel = '#022c22';
       strokeLabel = '#34d399';
       textLabelColor = '#a7f3d0';
       pinFill = '#10b981';
       iconSymbol = '🌿';
+      width = 124;
+      centerX = 62;
+      rectWidth = 118;
+      fontSize = '10.2';
     }
 
     const svgWrap = document.createElement('div');
     svgWrap.className = 'hq-svg-marker-wrapper';
-    svgWrap.style.width = '96px';
+    svgWrap.style.width = `${width}px`;
     svgWrap.style.height = '60px';
     svgWrap.style.cursor = 'pointer';
 
     // Pure Mathematical Zero-Drift Single SVG Vector
-    // Width: 96px, Height: 60px, Center X=48, Needle Tip=(48, 60)
-    // MapLibre anchor 'bottom' positions (48, 60) directly on geographical coordinates
+    // MapLibre anchor 'bottom' positions (centerX, 60) directly on geographical coordinates
     svgWrap.innerHTML = `
-      <svg width="96" height="60" viewBox="0 0 96 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.85));">
+      <svg width="${width}" height="60" viewBox="0 0 ${width} 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.85));">
         ${hasPulse ? `
-          <circle cx="48" cy="60" r="4" fill="none" stroke="${pinFill}" stroke-width="2">
+          <circle cx="${centerX}" cy="60" r="4" fill="none" stroke="${pinFill}" stroke-width="2">
             <animate attributeName="r" from="4" to="26" dur="2s" repeatCount="indefinite" />
             <animate attributeName="opacity" from="0.9" to="0" dur="2s" repeatCount="indefinite" />
             <animate attributeName="stroke-width" from="2" to="0.5" dur="2s" repeatCount="indefinite" />
           </circle>
-          <circle cx="48" cy="60" r="4" fill="none" stroke="${pinFill}" stroke-width="1.5">
+          <circle cx="${centerX}" cy="60" r="4" fill="none" stroke="${pinFill}" stroke-width="1.5">
             <animate attributeName="r" from="4" to="26" dur="2s" begin="1s" repeatCount="indefinite" />
             <animate attributeName="opacity" from="0.9" to="0" dur="2s" begin="1s" repeatCount="indefinite" />
             <animate attributeName="stroke-width" from="1.5" to="0.5" dur="2s" begin="1s" repeatCount="indefinite" />
           </circle>
         ` : ''}
 
-        <!-- 1. Needle Pin Path (Center X=48, Needle Tip at 48, 60) -->
-        <path d="M 38 35 C 38 35 39 48 48 60 C 57 48 58 35 58 35 A 10 10 0 1 0 38 35 Z" fill="${pinFill}" stroke="#ffffff" stroke-width="2"/>
-        <circle cx="48" cy="35" r="3.5" fill="#ffffff"/>
+        <!-- 1. Needle Pin Path (Center X=${centerX}, Needle Tip at ${centerX}, 60) -->
+        <path d="M ${centerX - 10} 35 C ${centerX - 10} 35 ${centerX - 9} 48 ${centerX} 60 C ${centerX + 9} 48 ${centerX + 10} 35 ${centerX + 10} 35 A 10 10 0 1 0 ${centerX - 10} 35 Z" fill="${pinFill}" stroke="#ffffff" stroke-width="2"/>
+        <circle cx="${centerX}" cy="35" r="3.5" fill="#ffffff"/>
 
-        <!-- 2. Top Badge Box (Center X=48) -->
-        <rect x="4" y="2" width="88" height="23" rx="4" fill="${bgLabel}" stroke="${strokeLabel}" stroke-width="1.5"/>
-        <text x="48" y="17.5" text-anchor="middle" fill="${textLabelColor}" font-family="-apple-system, BlinkMacSystemFont, 'Pretendard', sans-serif" font-size="11" font-weight="800" letter-spacing="-0.2px">
+        <!-- 2. Top Badge Box (Center X=${centerX}) -->
+        <rect x="3" y="2" width="${rectWidth}" height="23" rx="4" fill="${bgLabel}" stroke="${strokeLabel}" stroke-width="1.5"/>
+        <text x="${centerX}" y="17.5" text-anchor="middle" fill="${textLabelColor}" font-family="-apple-system, BlinkMacSystemFont, 'Pretendard', sans-serif" font-size="${fontSize}" font-weight="800" letter-spacing="-0.2px">
           ${iconSymbol} ${title}
         </text>
       </svg>
@@ -325,9 +336,9 @@ class MapController {
     this.projects.forEach(proj => {
       let labelText = proj.title || '사업지';
       if (proj.id === 'proj-dcs-geumgang-01') {
-        labelText = '천내리습지';
+        labelText = '금산(천내리습지)';
       } else if (proj.id === 'proj-dcs-doowoong-02') {
-        labelText = '두웅습지';
+        labelText = '태안(두웅습지)';
       } else if (proj.id === 'proj-jb-crayfish-01') {
         labelText = '완주(미국가재)';
       } else if (proj.id === 'proj-jb-goldenrod-02') {
@@ -336,8 +347,8 @@ class MapController {
         const cleanLoc = proj.location_name.replace(/^(충청남도|전북특별자치도|전라북도|경기도|강원도|경상남도|경상북도|전라남도|제주특별자치도|서울특별시|인천광역시|대전광역시|광주광역시|대구광역시|부산광역시|울산광역시|세종특별자치시)\s*/, '');
         const words = cleanLoc.split(/\s+/);
         labelText = words.slice(0, 2).join(' ') || proj.title;
-        if (labelText.length > 8) {
-          labelText = labelText.slice(0, 7) + '..';
+        if (labelText.length > 9) {
+          labelText = labelText.slice(0, 8) + '..';
         }
       }
 

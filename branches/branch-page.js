@@ -375,32 +375,34 @@ class BranchMonitorApp {
     this.projectsData.forEach(p => {
       const pWrap = document.createElement('div');
       pWrap.className = 'hq-svg-marker-wrapper';
-      pWrap.style.width = '110px';
+      pWrap.style.width = '124px';
       pWrap.style.height = '60px';
       pWrap.style.cursor = 'pointer';
       pWrap.title = `${p.title} [${p.location_name}]`;
 
       let labelText = p.title;
-      if (p.id === 'proj-jb-crayfish-01') labelText = '완주(미국가재)';
+      if (p.id === 'proj-dcs-geumgang-01') labelText = '금산(천내리습지)';
+      else if (p.id === 'proj-dcs-doowoong-02') labelText = '태안(두웅습지)';
+      else if (p.id === 'proj-jb-crayfish-01') labelText = '완주(미국가재)';
       else if (p.id === 'proj-jb-goldenrod-02') labelText = '익산(양미역취)';
-      else if (labelText.length > 7) labelText = labelText.slice(0, 7) + '..';
+      else if (labelText.length > 9) labelText = labelText.slice(0, 8) + '..';
 
       pWrap.innerHTML = `
-        <svg width="110" height="60" viewBox="0 0 110 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.85));">
-          <circle cx="55" cy="60" r="4" fill="none" stroke="#10b981" stroke-width="2">
+        <svg width="124" height="60" viewBox="0 0 124 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.85));">
+          <circle cx="62" cy="60" r="4" fill="none" stroke="#10b981" stroke-width="2">
             <animate attributeName="r" from="4" to="26" dur="2s" repeatCount="indefinite" />
             <animate attributeName="opacity" from="0.9" to="0" dur="2s" repeatCount="indefinite" />
             <animate attributeName="stroke-width" from="2" to="0.5" dur="2s" repeatCount="indefinite" />
           </circle>
-          <circle cx="55" cy="60" r="4" fill="none" stroke="#10b981" stroke-width="1.5">
+          <circle cx="62" cy="60" r="4" fill="none" stroke="#10b981" stroke-width="1.5">
             <animate attributeName="r" from="4" to="26" dur="2s" begin="1s" repeatCount="indefinite" />
             <animate attributeName="opacity" from="0.9" to="0" dur="2s" begin="1s" repeatCount="indefinite" />
             <animate attributeName="stroke-width" from="1.5" to="0.5" dur="2s" begin="1s" repeatCount="indefinite" />
           </circle>
-          <path d="M 45 35 C 45 35 46 48 55 60 C 64 48 65 35 65 35 A 10 10 0 1 0 45 35 Z" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
-          <circle cx="55" cy="35" r="3.5" fill="#ffffff"/>
-          <rect x="2" y="2" width="106" height="23" rx="4" fill="#022c22" stroke="#34d399" stroke-width="1.5"/>
-          <text x="55" y="17.5" text-anchor="middle" fill="#a7f3d0" font-family="-apple-system, BlinkMacSystemFont, 'Pretendard', sans-serif" font-size="10.5" font-weight="800">
+          <path d="M 52 35 C 52 35 53 48 62 60 C 71 48 72 35 72 35 A 10 10 0 1 0 52 35 Z" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
+          <circle cx="62" cy="35" r="3.5" fill="#ffffff"/>
+          <rect x="3" y="2" width="118" height="23" rx="4" fill="#022c22" stroke="#34d399" stroke-width="1.5"/>
+          <text x="62" y="17.5" text-anchor="middle" fill="#a7f3d0" font-family="-apple-system, BlinkMacSystemFont, 'Pretendard', sans-serif" font-size="10.2" font-weight="800">
             🌿 ${labelText}
           </text>
         </svg>
