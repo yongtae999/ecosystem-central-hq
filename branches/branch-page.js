@@ -62,7 +62,7 @@ class BranchMonitorApp {
 
       this.branchData = bRes.find(b => b.id === this.branchId) || bRes[1];
       
-      // 2. Check dynamic projects from LocalStorage & Cloud
+      // 2. Check dynamic projects from LocalStorage & Cloud (Server seed data always takes precedence over old local cache)
       let allProjects = Array.isArray(pRes) ? [...pRes] : [];
       const localProjects = localStorage.getItem('wma_ecosystem_projects_v5');
       if (localProjects) {
@@ -71,9 +71,14 @@ class BranchMonitorApp {
           if (Array.isArray(userProjects)) {
             userProjects.forEach(up => {
               const idx = allProjects.findIndex(p => p.id === up.id);
-              if (idx >= 0) allProjects[idx] = Object.assign({}, allProjects[idx], up);
-              else allProjects.push(up);
+              if (idx >= 0) {
+                // Keep server seed data (fresh coordinates & live_dashboard_url) overriding old cached local values
+                allProjects[idx] = Object.assign({}, up, allProjects[idx]);
+              } else {
+                allProjects.push(up);
+              }
             });
+            localStorage.setItem('wma_ecosystem_projects_v5', JSON.stringify(allProjects));
           }
         } catch (e) {}
       }
@@ -162,9 +167,10 @@ class BranchMonitorApp {
             if (Array.isArray(userProjects)) {
               userProjects.forEach(up => {
                 const idx = allProjects.findIndex(p => p.id === up.id);
-                if (idx >= 0) allProjects[idx] = Object.assign({}, allProjects[idx], up);
+                if (idx >= 0) allProjects[idx] = Object.assign({}, up, allProjects[idx]);
                 else allProjects.push(up);
               });
+              localStorage.setItem('wma_ecosystem_projects_v5', JSON.stringify(allProjects));
             }
           } catch (e) {}
         }
@@ -504,6 +510,7 @@ class BranchMonitorApp {
           <div style="font-size: 0.74rem; margin-top: 4px; color: #334155;">📍 위치: ${p.location_name}</div>
           <div style="font-size: 0.72rem; color: #d97706; margin-top: 2px;">🎯 대상종: ${Array.isArray(p.target_species) ? p.target_species.join(', ') : p.target_species}</div>
           <div style="font-size: 0.72rem; color: #0284c7; font-weight: 700; margin-top: 4px;">📊 실적: ${Number(p.total_area_m2).toLocaleString()}㎡ / ${Number(p.total_harvest_kg).toLocaleString()}kg</div>
+          ${p.live_dashboard_url ? `<a href="${p.live_dashboard_url}" target="_blank" style="display: inline-block; margin-top: 6px; padding: 4px 8px; background: #0284c7; color: #fff; font-size: 0.72rem; font-weight: 700; text-decoration: none; border-radius: 4px; width: 100%; text-align: center; box-sizing: border-box;">🚀 3D 드론 정사영상 열기</a>` : ''}
         </div>
       `);
 
