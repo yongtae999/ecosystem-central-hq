@@ -81,8 +81,8 @@
     "title": "2026년 생태계교란 식물(양미역취 등) 제거사업",
     "client": "전북지방환경청",
     "organizer": "(사)야생생물관리협회 전북지부",
-    "status": "ongoing",
-    "status_label": "진행중 (M3T 드론 정사영상 예찰 및 굴취)",
+    "status": "pending",
+    "status_label": "미실시 (작업 준비 대기)",
     "target_species": ["양미역취", "가시박", "환삼덩굴"],
     "location_name": "전북 익산시 춘포면 만경강 일원",
     "lat": 35.895567,
@@ -91,12 +91,12 @@
     "pitch": 0,
     "bearing": 0,
     "period": "2026.05 ~ 2026.11",
-    "total_area_m2": 24000,
-    "total_harvest_kg": 1250,
-    "drone_flights": 1,
+    "total_area_m2": 0,
+    "total_harvest_kg": 0,
+    "drone_flights": 0,
     "live_dashboard_url": "https://yongtae999.github.io/geumgang-drone-monitor/?project=chunpo",
     "is_representative": true,
-    "features": ["DJI M3T 드론 정사영상 격자 비행", "만경강 북안 수변부 양미역취 군락", "Before/After 정밀 예찰 및 굴취", "실시간 작업일지 연동"],
-    "desc": "익산시 춘포면 만경강 북안 수변부(위경도 35.895567, 126.993717) 양미역취·가시박 등 교란식물 집중 예초 및 뿌리굴취 제거사업 (드론 M3T 정밀 관제 운용)"
+    "features": ["DJI M3T 드론 정사영상 비행 준비", "만경강 북안 수변부 양미역취 군락", "정밀 예찰 및 작업 준비", "실시간 관제 연동"],
+    "desc": "익산시 춘포면 만경강 북안 수변부(위경도 35.895567, 126.993717) 양미역취·가시박 등 교란식물 집중 예초 및 뿌리굴취 제거사업 (작업 준비 단계 / 미실시)"
   }
 ]
