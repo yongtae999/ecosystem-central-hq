@@ -314,7 +314,7 @@ class BranchMonitorApp {
 
     // Calculate center based on office + projects
     let center = [b.lng, b.lat];
-    let initialZoom = b.zoom || 13.5;
+    let initialZoom = 12.0;
 
     if (this.projectsData.length > 0) {
       let sumLng = b.lng;
