@@ -84,7 +84,7 @@
     "status": "ongoing",
     "status_label": "진행중 (M3T 드론 정사영상 예찰 및 굴취)",
     "target_species": ["양미역취", "가시박", "환삼덩굴"],
-    "location_name": "전북 익산시 춘포면 만경강 일원 (익산 춘포역사 ~ 벨라비스 인근)",
+    "location_name": "전북 익산시 춘포면 만경강 일원",
     "lat": 35.895567,
     "lng": 126.993717,
     "zoom": 15.5,
@@ -96,7 +96,7 @@
     "drone_flights": 1,
     "live_dashboard_url": "https://yongtae999.github.io/geumgang-drone-monitor/?project=chunpo",
     "is_representative": true,
-    "features": ["DJI M3T 드론 정사영상 격자 비행", "만경강 북안 양미역취 1·2·3구간", "Before/After 정밀 예찰 및 굴취", "실시간 작업일지 연동"],
+    "features": ["DJI M3T 드론 정사영상 격자 비행", "만경강 북안 수변부 양미역취 군락", "Before/After 정밀 예찰 및 굴취", "실시간 작업일지 연동"],
     "desc": "익산시 춘포면 만경강 북안 수변부(위경도 35.895567, 126.993717) 양미역취·가시박 등 교란식물 집중 예초 및 뿌리굴취 제거사업 (드론 M3T 정밀 관제 운용)"
   }
 ]
