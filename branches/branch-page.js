@@ -96,10 +96,10 @@ class BranchMonitorApp {
 
       this.activitiesData = allActivities.filter(a => a.branch_id === this.branchId);
 
-      this.renderBranchInfo();
-      this.renderProjectsList();
-      this.renderActivitiesList();
-      this.initMap();
+      try { this.renderBranchInfo(); } catch(e) { console.warn("renderBranchInfo error:", e); }
+      try { this.renderProjectsList(); } catch(e) { console.warn("renderProjectsList error:", e); }
+      try { this.renderActivitiesList(); } catch(e) { console.warn("renderActivitiesList error:", e); }
+      try { this.initMap(); } catch(e) { console.error("initMap error:", e); }
 
       // Subscribe to real-time updates from other branches & HQ (BroadcastChannel)
       if (typeof BroadcastChannel !== 'undefined' && !this.bcSubscribed) {
@@ -264,6 +264,28 @@ class BranchMonitorApp {
         <div style="font-size: 0.72rem; color: #f59e0b; margin-bottom: 4px;">대상종: ${Array.isArray(p.target_species) ? p.target_species.join(', ') : p.target_species || '교란생물'}</div>
         <div style="font-size: 0.75rem; font-weight: 700; color: #38bdf8; margin-bottom: 6px;">실적: ${(Number(p.total_area_m2)).toLocaleString()}㎡ / ${(Number(p.total_harvest_kg)).toLocaleString()}kg</div>
         ${p.live_dashboard_url ? `<a href="${p.live_dashboard_url}" target="_blank" class="btn-tactical primary" style="width: 100%; justify-content: center; font-size: 0.72rem;" onclick="event.stopPropagation();">🚀 3D 드론 정사영상 열기</a>` : ''}
+      </div>
+    `).join('');
+  }
+
+  renderActivitiesList() {
+    const container = document.getElementById('branch-activities-list');
+    if (!container) return;
+
+    if (!this.activitiesData || this.activitiesData.length === 0) {
+      container.innerHTML = `
+        <div style="font-size: 0.72rem; color: #64748b; padding: 8px 0; text-align: center;">
+          등록된 최근 작업일지가 없습니다.
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = this.activitiesData.slice(0, 5).map(a => `
+      <div style="background: rgba(15,23,42,0.6); border: 1px solid var(--border-subtle); border-radius: 4px; padding: 8px; margin-bottom: 6px;">
+        <div style="font-size: 0.75rem; font-weight: 700; color: #38bdf8;">${a.date || ''} (${a.round || 1}차 작업)</div>
+        <div style="font-size: 0.7rem; color: #cbd5e1; margin-top: 2px;">📍 ${a.location_name || a.project_title || ''}</div>
+        <div style="font-size: 0.7rem; color: #34d399; margin-top: 2px;">수거: ${(Number(a.harvest_kg) || 0).toLocaleString()}kg / ${(Number(a.area_m2) || 0).toLocaleString()}㎡</div>
       </div>
     `).join('');
   }
