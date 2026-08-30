@@ -107,7 +107,7 @@ class BranchMonitorApp {
         const bc = new BroadcastChannel('wma_ecosystem_national_channel');
         bc.onmessage = () => {
           console.log(`📡 [BranchMonitor] Real-time sync update received for branch: ${this.branchId}`);
-          this.init();
+          this.refreshData();
         };
       }
 
@@ -117,7 +117,7 @@ class BranchMonitorApp {
         window.cloudSync.init().then(() => {
           window.cloudSync.subscribeToCloudData(() => {
             console.log(`☁️ [BranchMonitor] Cloud sync update received for branch: ${this.branchId}`);
-            this.init();
+            this.refreshData();
           });
         });
 
@@ -138,11 +138,60 @@ class BranchMonitorApp {
         this.eventSubscribed = true;
         window.addEventListener('wma_data_synced', () => {
           console.log(`⚡ [BranchMonitor] Local data synced event received for branch: ${this.branchId}`);
-          this.init();
+          this.refreshData();
         });
       }
     } catch (err) {
       console.error("Error loading branch app:", err);
+    }
+  }
+
+  async refreshData() {
+    const t = Date.now();
+    try {
+      const [pRes, aRes] = await Promise.all([
+        fetch(`../../data/projects.json?t=${t}`).then(r => r.ok ? r.json() : null).catch(() => null),
+        fetch(`../../data/national_activities.json?t=${t}`).then(r => r.ok ? r.json() : []).catch(() => [])
+      ]);
+      if (pRes && Array.isArray(pRes)) {
+        let allProjects = [...pRes];
+        const localProjects = localStorage.getItem('wma_ecosystem_projects_v5');
+        if (localProjects) {
+          try {
+            const userProjects = JSON.parse(localProjects);
+            if (Array.isArray(userProjects)) {
+              userProjects.forEach(up => {
+                const idx = allProjects.findIndex(p => p.id === up.id);
+                if (idx >= 0) allProjects[idx] = Object.assign({}, allProjects[idx], up);
+                else allProjects.push(up);
+              });
+            }
+          } catch (e) {}
+        }
+        this.projectsData = allProjects.filter(p => p.branch_id === this.branchId);
+      }
+      if (aRes && Array.isArray(aRes)) {
+        let allActivities = [...aRes];
+        const localActivities = localStorage.getItem('wma_ecosystem_activities_v5');
+        if (localActivities) {
+          try {
+            const userActs = JSON.parse(localActivities);
+            if (Array.isArray(userActs)) {
+              userActs.forEach(ua => {
+                if (!allActivities.some(a => a.id === ua.id)) allActivities.unshift(ua);
+              });
+            }
+          } catch (e) {}
+        }
+        this.activitiesData = allActivities.filter(a => a.branch_id === this.branchId);
+      }
+
+      this.renderBranchInfo();
+      this.renderProjectsList();
+      this.renderActivitiesList();
+      this.setupMarkers();
+    } catch (e) {
+      console.warn("refreshData error:", e);
     }
   }
 
@@ -270,6 +319,17 @@ class BranchMonitorApp {
           'satellite-tiles': {
             type: 'raster',
             tiles: [
+              'https://mt0.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+              'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+              'https://mt2.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+              'https://mt3.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
+            ],
+            tileSize: 256,
+            maxzoom: 20
+          },
+          'hybrid-tiles': {
+            type: 'raster',
+            tiles: [
               'https://mt0.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
               'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
               'https://mt2.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
@@ -313,6 +373,14 @@ class BranchMonitorApp {
     } else {
       this.map.on('load', onMapReady);
     }
+
+    setTimeout(() => {
+      if (this.map) this.map.resize();
+    }, 300);
+
+    setTimeout(() => {
+      if (this.map) this.map.resize();
+    }, 1000);
 
     window.addEventListener('resize', () => {
       if (this.map) this.map.resize();
