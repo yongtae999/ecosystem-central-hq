@@ -7,7 +7,7 @@
     "client": "기후부 금강유역환경청",
     "organizer": "(사)야생생물관리협회 대전충남세종지부",
     "status": "ongoing",
-    "status_label": "1·2·3·4차 제거 완료 (누적 13.2만㎡ / 3,080kg)",
+    "status_label": "1·2·3·4·5차 제거 완료 (누적 16.2만㎡ / 5,130kg)",
     "target_species": ["가시박", "단풍잎돼지풀", "환삼덩굴"],
     "location_name": "충청남도 금산군 제원면 천내리습지 1·2·3구간",
     "lat": 36.126830,
@@ -16,13 +16,13 @@
     "pitch": 0,
     "bearing": 0,
     "period": "2026.05 ~ 2026.11",
-    "total_area_m2": 132000,
-    "total_harvest_kg": 3080,
-    "drone_flights": 42,
+    "total_area_m2": 162000,
+    "total_harvest_kg": 5130,
+    "drone_flights": 48,
     "live_dashboard_url": "https://yongtae999.github.io/geumgang-drone-monitor/",
     "is_representative": true,
     "features": ["초고해상도 드론 정사영상", "1·2·3구간 다각형 폴리곤", "Before/After 인터랙티브 슬라이더", "주간 활동일지 연동"],
-    "desc": "천내리습지 1·2·3구간 생태계교란식물 1~4차 제거작업 완료 (4차 환삼덩굴 70% 700kg / 가시박 30% 300kg 제거)"
+    "desc": "천내리습지 1·2·3구간 생태계교란식물 1~5차 제거작업 완료 (5차 2026.09.04 가시박·환삼덩굴 30,000㎡ / 1,700kg 제거, 6명 투입)"
   },
   {
     "id": "proj-dcs-doowoong-02",
