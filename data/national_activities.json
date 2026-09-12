@@ -1,5 +1,20 @@
 [
   {
+    "id": "act-dcs-doowoong-01",
+    "branch_id": "daejeon-chungnam-sejong",
+    "branch_name": "대전·충남·세종 지부",
+    "project_id": "proj-dcs-doowoong-02",
+    "project_title": "2026년 두웅습지 외래생물 실태조사 및 확산방지 용역",
+    "date": "2026-09-11",
+    "work_type": "1차 외래생물 방제작업 (통발 포획 및 수생식물 굴취)",
+    "worker_count": 4,
+    "area_m2": 45000,
+    "harvest_kg": 200,
+    "location": "충청남도 태안군 원북면 신두해변길 291-30 (두웅습지보호지역)",
+    "summary": "두웅습지 1차 외래생물 방제작업 완료 (미국수련 및 마름 지하경·줄기 200kg 수작업 굴취 수거, 황소개구리 포획통발 15개소 설치 가동, 작업인원 4명, 6시간 소요)",
+    "status": "완료"
+  },
+  {
     "id": "act-dcs-05",
     "branch_id": "daejeon-chungnam-sejong",
     "branch_name": "대전·충남·세종 지부",
@@ -73,20 +88,5 @@
     "location": "충청남도 금산군 제원면 천내리습지 상류부",
     "summary": "천내리습지 1차 발아기 유생 손 뿌리뽑기 방제 (18,000㎡ / 80kg)",
     "status": "완료"
-  },
-  {
-    "id": "act-dcs-02",
-    "branch_id": "daejeon-chungnam-sejong",
-    "branch_name": "대전·충남·세종 지부",
-    "project_id": "proj-dcs-doowoong-02",
-    "project_title": "2026년 두웅습지 외래생물 실태조사 및 확산방지 용역",
-    "date": "2026-04-30",
-    "work_type": "사업 계약 체결",
-    "worker_count": 0,
-    "area_m2": 0,
-    "harvest_kg": 0,
-    "location": "태안군 두웅습지 람사르습지보호지역",
-    "summary": "두웅습지 외래생물(황소개구리·미국수련) 실태조사 및 확산방지 용역 계약 완료 (현장 정밀 실태조사 및 포획·퇴치 착수 예정)",
-    "status": "진행예정"
   }
 ]
