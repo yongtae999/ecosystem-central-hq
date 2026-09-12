@@ -51,9 +51,14 @@ class DataStore {
       if (localActivitiesRaw) {
         try {
           const localActs = JSON.parse(localActivitiesRaw);
-          const userAddedActs = localActs.filter(la => 
-            !seedActivities.some(sa => sa.id === la.id)
-          );
+          const userAddedActs = localActs.filter(la => {
+            if (seedActivities.some(sa => sa.id === la.id)) return false;
+            if (la.id === 'act-dcs-02') return false;
+            const d = la.date || '';
+            if (d.includes('04-30') || d.includes('04/30') || d.includes('4월 30') || d.includes('4월30')) return false;
+            if (la.work_type && la.work_type.includes('계약')) return false;
+            return true;
+          });
           this.activities = [...seedActivities, ...userAddedActs];
         } catch (e) {
           this.activities = seedActivities;
